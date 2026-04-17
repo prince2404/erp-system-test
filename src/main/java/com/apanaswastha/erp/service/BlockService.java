@@ -4,6 +4,7 @@ import com.apanaswastha.erp.dto.BlockResponse;
 import com.apanaswastha.erp.dto.CreateBlockRequest;
 import com.apanaswastha.erp.entity.Block;
 import com.apanaswastha.erp.entity.District;
+import com.apanaswastha.erp.exception.NotFoundException;
 import com.apanaswastha.erp.repository.BlockRepository;
 import com.apanaswastha.erp.repository.DistrictRepository;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class BlockService {
 
     public BlockResponse create(CreateBlockRequest request) {
         District district = districtRepository.findById(request.getDistrictId())
-                .orElseThrow(() -> new IllegalArgumentException("District not found with id: " + request.getDistrictId()));
+                .orElseThrow(() -> new NotFoundException("District not found with id: " + request.getDistrictId()));
 
         Block block = new Block();
         block.setName(request.getName());
@@ -40,7 +41,7 @@ public class BlockService {
 
     public BlockResponse getById(Long id) {
         Block block = blockRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Block not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Block not found with id: " + id));
         return toResponse(block);
     }
 

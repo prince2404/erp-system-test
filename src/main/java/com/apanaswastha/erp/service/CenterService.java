@@ -4,6 +4,7 @@ import com.apanaswastha.erp.dto.CenterResponse;
 import com.apanaswastha.erp.dto.CreateCenterRequest;
 import com.apanaswastha.erp.entity.Block;
 import com.apanaswastha.erp.entity.Center;
+import com.apanaswastha.erp.exception.NotFoundException;
 import com.apanaswastha.erp.repository.BlockRepository;
 import com.apanaswastha.erp.repository.CenterRepository;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class CenterService {
 
     public CenterResponse create(CreateCenterRequest request) {
         Block block = blockRepository.findById(request.getBlockId())
-                .orElseThrow(() -> new IllegalArgumentException("Block not found with id: " + request.getBlockId()));
+                .orElseThrow(() -> new NotFoundException("Block not found with id: " + request.getBlockId()));
 
         Center center = new Center();
         center.setName(request.getName());
@@ -43,7 +44,7 @@ public class CenterService {
 
     public CenterResponse getById(Long id) {
         Center center = centerRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Center not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Center not found with id: " + id));
         return toResponse(center);
     }
 

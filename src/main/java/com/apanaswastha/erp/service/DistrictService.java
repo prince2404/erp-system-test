@@ -4,6 +4,7 @@ import com.apanaswastha.erp.dto.CreateDistrictRequest;
 import com.apanaswastha.erp.dto.DistrictResponse;
 import com.apanaswastha.erp.entity.District;
 import com.apanaswastha.erp.entity.State;
+import com.apanaswastha.erp.exception.NotFoundException;
 import com.apanaswastha.erp.repository.DistrictRepository;
 import com.apanaswastha.erp.repository.StateRepository;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class DistrictService {
 
     public DistrictResponse create(CreateDistrictRequest request) {
         State state = stateRepository.findById(request.getStateId())
-                .orElseThrow(() -> new IllegalArgumentException("State not found with id: " + request.getStateId()));
+                .orElseThrow(() -> new NotFoundException("State not found with id: " + request.getStateId()));
 
         District district = new District();
         district.setName(request.getName());
@@ -40,7 +41,7 @@ public class DistrictService {
 
     public DistrictResponse getById(Long id) {
         District district = districtRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("District not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("District not found with id: " + id));
         return toResponse(district);
     }
 

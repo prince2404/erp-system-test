@@ -3,6 +3,7 @@ package com.apanaswastha.erp.service;
 import com.apanaswastha.erp.dto.CreateStateRequest;
 import com.apanaswastha.erp.dto.StateResponse;
 import com.apanaswastha.erp.entity.State;
+import com.apanaswastha.erp.exception.NotFoundException;
 import com.apanaswastha.erp.repository.StateRepository;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +33,7 @@ public class StateService {
 
     public StateResponse getById(Long id) {
         State state = stateRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("State not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("State not found with id: " + id));
         return toResponse(state);
     }
 

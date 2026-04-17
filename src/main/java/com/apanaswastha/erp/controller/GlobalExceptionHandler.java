@@ -1,6 +1,7 @@
 package com.apanaswastha.erp.controller;
 
 import com.apanaswastha.erp.payload.ApiResponse;
+import com.apanaswastha.erp.exception.NotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<Object>> handleBadRequest(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleNotFound(NotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ApiResponse.error(ex.getMessage()));
     }
 
@@ -42,8 +49,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiResponse<Object>> handleDataIntegrity(DataIntegrityViolationException ex) {
+        String message = "Data integrity violation";
+        Throwable cause = ex.getMostSpecificCause();
+        if (cause != null && cause.getMessage() != null) {
+            String lowerMessage = cause.getMessage().toLowerCase();
+            if (lowerMessage.contains("unique") || lowerMessage.contains("duplicate")) {
+                message = "Duplicate value violates a unique constraint";
+            }
+        }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error("Constraint violation"));
+                .body(ApiResponse.error(message));
     }
 
     @ExceptionHandler(BadCredentialsException.class)
