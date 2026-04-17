@@ -15,12 +15,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class FamilyService {
+
+    private static final String DEFAULT_STATE_CODE = "BH";
+    private static final String DEFAULT_DISTRICT_CODE = "GEN";
 
     private final FamilyRepository familyRepository;
     private final FamilyMemberRepository familyMemberRepository;
@@ -44,7 +46,7 @@ public class FamilyService {
         Family family = new Family();
         family.setFamilyHeadName(request.getFamilyHeadName());
         family.setCenter(center);
-        family.setWalletBalance(BigDecimal.ZERO.setScale(2, RoundingMode.UNNECESSARY));
+        family.setWalletBalance(new BigDecimal("0.00"));
         family.setHealthCardNumber("PENDING-" + UUID.randomUUID().toString().replace("-", ""));
         family.setQrCodeReference("PENDING-" + UUID.randomUUID());
 
@@ -112,17 +114,34 @@ public class FamilyService {
     }
 
     private String generateHealthCardNumber(Family family) {
-        String districtCode = "GEN";
-        String centerCode = family.getCenter().getCenterCode();
-        if (centerCode != null && !centerCode.isBlank()) {
-            String[] parts = centerCode.split("-");
-            if (parts.length >= 2 && !parts[1].isBlank()) {
-                districtCode = parts[1].toUpperCase();
-            }
+        String stateCode = DEFAULT_STATE_CODE;
+        if (family.getCenter() != null
+                && family.getCenter().getBlock() != null
+                && family.getCenter().getBlock().getDistrict() != null
+                && family.getCenter().getBlock().getDistrict().getState() != null
+                && family.getCenter().getBlock().getDistrict().getState().getCode() != null
+                && !family.getCenter().getBlock().getDistrict().getState().getCode().isBlank()) {
+            stateCode = family.getCenter().getBlock().getDistrict().getState().getCode().toUpperCase();
         }
+
+        String districtCode = extractDistrictCode(family.getCenter().getCenterCode());
 
         String centerSegment = String.format("%03d", family.getCenter().getId());
         String familySegment = String.format("%05d", family.getId());
-        return "ASK-BH-" + districtCode + "-" + centerSegment + "-" + familySegment;
+        return "ASK-" + stateCode + "-" + districtCode + "-" + centerSegment + "-" + familySegment;
+    }
+
+    private String extractDistrictCode(String centerCode) {
+        if (centerCode == null || centerCode.isBlank()) {
+            return DEFAULT_DISTRICT_CODE;
+        }
+
+        String[] parts = centerCode.split("-");
+        if (parts.length < 2) {
+            return DEFAULT_DISTRICT_CODE;
+        }
+
+        String code = parts[1].replaceAll("[^A-Za-z0-9]", "").toUpperCase();
+        return code.isBlank() ? DEFAULT_DISTRICT_CODE : code;
     }
 }

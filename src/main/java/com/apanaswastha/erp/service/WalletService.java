@@ -51,7 +51,7 @@ public class WalletService {
             TransactionType transactionType
     ) {
         if (walletTransactionRepository.existsByReferenceId(request.getReferenceId())) {
-            throw new IllegalArgumentException("Duplicate transaction reference id");
+            throw new IllegalArgumentException("Duplicate transaction reference id: " + request.getReferenceId());
         }
 
         Family family = familyRepository.findByHealthCardNumber(request.getHealthCardNumber())
