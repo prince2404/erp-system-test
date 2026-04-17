@@ -10,6 +10,8 @@ import com.apanaswastha.erp.dto.CreateDiagnosisRequest;
 import com.apanaswastha.erp.dto.CreateDistrictRequest;
 import com.apanaswastha.erp.dto.CreateFamilyMemberRequest;
 import com.apanaswastha.erp.dto.CreateFamilyRequest;
+import com.apanaswastha.erp.dto.CreateInventoryBatchRequest;
+import com.apanaswastha.erp.dto.CreateMedicineRequest;
 import com.apanaswastha.erp.dto.CreateStateRequest;
 import com.apanaswastha.erp.dto.DiagnosisResponse;
 import com.apanaswastha.erp.dto.DistrictResponse;
@@ -17,12 +19,14 @@ import com.apanaswastha.erp.dto.FamilyMemberResponse;
 import com.apanaswastha.erp.dto.FamilyResponse;
 import com.apanaswastha.erp.dto.PrescriptionItemRequest;
 import com.apanaswastha.erp.dto.PrescriptionResponse;
+import com.apanaswastha.erp.entity.Vendor;
 import com.apanaswastha.erp.entity.Role;
 import com.apanaswastha.erp.entity.User;
 import com.apanaswastha.erp.entity.enums.AppointmentStatus;
 import com.apanaswastha.erp.entity.enums.RoleName;
 import com.apanaswastha.erp.repository.RoleRepository;
 import com.apanaswastha.erp.repository.UserRepository;
+import com.apanaswastha.erp.repository.VendorRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,6 +34,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,10 +66,16 @@ class OpdServiceIntegrationTest {
     private OpdService opdService;
 
     @Autowired
+    private InventoryService inventoryService;
+
+    @Autowired
     private RoleRepository roleRepository;
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private VendorRepository vendorRepository;
 
     @Test
     void shouldCreateAppointmentAddDiagnosisAndDispensePrescription() {
@@ -109,11 +120,38 @@ class OpdServiceIntegrationTest {
         AppointmentResponse pharmacy = opdService.updateAppointmentStatus(appointment.getId(), AppointmentStatus.PHARMACY);
         assertEquals(AppointmentStatus.PHARMACY, pharmacy.getStatus());
 
+        seedInventory(center.getId(), "Paracetamol");
+
         PrescriptionResponse beforeDispense = diagnosis.getPrescriptions().get(0);
         assertFalse(beforeDispense.isDispensed());
 
         PrescriptionResponse dispensed = opdService.dispensePrescription(beforeDispense.getId());
         assertTrue(dispensed.isDispensed());
+    }
+
+    private void seedInventory(Long centerId, String medicineName) {
+        CreateMedicineRequest medicineRequest = new CreateMedicineRequest();
+        medicineRequest.setName(medicineName);
+        medicineRequest.setGenericName("Acetaminophen");
+        medicineRequest.setManufacturer("ABC Pharma");
+        Long medicineId = inventoryService.addMedicine(medicineRequest).getId();
+
+        Vendor vendor = new Vendor();
+        vendor.setName("MedSupply");
+        vendor.setContactInfo("9876501234");
+        vendor.setAddress("Patna");
+        vendor = vendorRepository.save(vendor);
+
+        CreateInventoryBatchRequest batchRequest = new CreateInventoryBatchRequest();
+        batchRequest.setMedicineId(medicineId);
+        batchRequest.setVendorId(vendor.getId());
+        batchRequest.setCenterId(centerId);
+        batchRequest.setBatchNumber("PARA-1");
+        batchRequest.setExpiryDate(LocalDate.now().plusDays(120));
+        batchRequest.setQuantityReceived(20);
+        batchRequest.setUnitPrice(new BigDecimal("5.00"));
+        batchRequest.setSellingPrice(new BigDecimal("6.50"));
+        inventoryService.addBatch(batchRequest);
     }
 
     private User createDoctor() {
