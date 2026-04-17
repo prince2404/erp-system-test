@@ -1,8 +1,11 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { TOKEN_STORAGE_KEY } from '../../lib/api'
+import { useCurrentUser } from '../../hooks/useAdminData'
+import { canAccessUsers } from '../../lib/rbac'
 
 const DashboardLayout = () => {
   const navigate = useNavigate()
+  const { data: currentUser } = useCurrentUser()
 
   const handleLogout = () => {
     localStorage.removeItem(TOKEN_STORAGE_KEY)
@@ -26,6 +29,48 @@ const DashboardLayout = () => {
             >
               Dashboard Home
             </NavLink>
+            <NavLink
+              to="/admin/states"
+              className={({ isActive }) =>
+                `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
+              }
+            >
+              States
+            </NavLink>
+            <NavLink
+              to="/admin/districts"
+              className={({ isActive }) =>
+                `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
+              }
+            >
+              Districts
+            </NavLink>
+            <NavLink
+              to="/admin/blocks"
+              className={({ isActive }) =>
+                `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
+              }
+            >
+              Blocks
+            </NavLink>
+            <NavLink
+              to="/admin/centers"
+              className={({ isActive }) =>
+                `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
+              }
+            >
+              Centers
+            </NavLink>
+            {canAccessUsers(currentUser?.role) ? (
+              <NavLink
+                to="/admin/users"
+                className={({ isActive }) =>
+                  `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
+                }
+              >
+                Users
+              </NavLink>
+            ) : null}
           </nav>
         </aside>
 
