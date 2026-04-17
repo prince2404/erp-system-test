@@ -64,25 +64,21 @@ const DashboardHomePage = () => {
           title="Total Revenue"
           value={currencyFormatter.format(data.totalRevenue)}
           icon={<IndianRupee size={18} />}
-          trend="+8.2% from previous cycle"
         />
         <StatCard
           title="Total Active Centers"
           value={numberFormatter.format(data.totalActiveCenters)}
           icon={<Building2 size={18} />}
-          trend="+2 this month"
         />
         <StatCard
           title="Pending Commissions"
           value={currencyFormatter.format(data.totalPendingCommissions)}
           icon={<Wallet size={18} />}
-          trend="Review payout queue"
         />
         <StatCard
           title="Daily OPD Visits"
           value={numberFormatter.format(data.dailyOpdVisits)}
           icon={<Activity size={18} />}
-          trend="Steady compared to yesterday"
         />
       </div>
 
