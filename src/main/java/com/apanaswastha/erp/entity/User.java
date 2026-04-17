@@ -42,6 +42,22 @@ public class User {
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_state_id")
+    private State assignedState;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_district_id")
+    private District assignedDistrict;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_block_id")
+    private Block assignedBlock;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_center_id")
+    private Center assignedCenter;
+
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
@@ -95,6 +111,38 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public State getAssignedState() {
+        return assignedState;
+    }
+
+    public void setAssignedState(State assignedState) {
+        this.assignedState = assignedState;
+    }
+
+    public District getAssignedDistrict() {
+        return assignedDistrict;
+    }
+
+    public void setAssignedDistrict(District assignedDistrict) {
+        this.assignedDistrict = assignedDistrict;
+    }
+
+    public Block getAssignedBlock() {
+        return assignedBlock;
+    }
+
+    public void setAssignedBlock(Block assignedBlock) {
+        this.assignedBlock = assignedBlock;
+    }
+
+    public Center getAssignedCenter() {
+        return assignedCenter;
+    }
+
+    public void setAssignedCenter(Center assignedCenter) {
+        this.assignedCenter = assignedCenter;
     }
 
     public boolean isDeleted() {
