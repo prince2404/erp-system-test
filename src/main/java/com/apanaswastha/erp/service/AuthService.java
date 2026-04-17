@@ -40,7 +40,7 @@ public class AuthService {
     }
 
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByUsernameOrEmail(request.getUsername(), request.getEmail())) {
+        if (userRepository.existsActiveByUsernameOrEmail(request.getUsername(), request.getEmail())) {
             throw new IllegalArgumentException("Username or email already exists");
         }
 
