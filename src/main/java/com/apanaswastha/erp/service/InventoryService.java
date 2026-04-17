@@ -108,7 +108,7 @@ public class InventoryService {
                 .orElseThrow(() -> new NotFoundException("Center not found with id: " + centerId));
 
         if (days != 30 && days != 60) {
-            throw new IllegalArgumentException("days must be either 30 or 60");
+            throw new IllegalArgumentException("days must be either 30 or 60, but received: " + days);
         }
 
         LocalDate today = LocalDate.now();

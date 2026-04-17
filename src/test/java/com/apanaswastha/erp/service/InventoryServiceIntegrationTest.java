@@ -33,6 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Transactional
 class InventoryServiceIntegrationTest {
 
+    private static final int MIN_QUANTITY_THRESHOLD_INCLUDING_ZERO = -1;
+
     @Autowired
     private StateService stateService;
 
@@ -65,7 +67,10 @@ class InventoryServiceIntegrationTest {
 
         inventoryService.dispenseMedicine(center.getId(), "Paracetamol", 7);
 
-        List<InventoryBatch> batches = inventoryBatchRepository.findByCenterIdAndQuantityAvailableGreaterThan(center.getId(), -1)
+        List<InventoryBatch> batches = inventoryBatchRepository.findByCenterIdAndQuantityAvailableGreaterThan(
+                        center.getId(),
+                        MIN_QUANTITY_THRESHOLD_INCLUDING_ZERO
+                )
                 .stream()
                 .sorted(java.util.Comparator.comparing(InventoryBatch::getBatchNumber))
                 .toList();
