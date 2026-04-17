@@ -34,9 +34,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 // JWT login/register endpoints are stateless and do not rely on browser sessions; CSRF remains active elsewhere.
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/v1/auth/**"))
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/auth/**", "/api/v1/auth/**"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
