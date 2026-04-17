@@ -73,7 +73,9 @@ public class BillingService {
                 .orElseThrow(() -> new NotFoundException("Appointment not found with id: " + appointmentId));
 
         if (appointment.getStatus() != AppointmentStatus.BILLING) {
-            throw new IllegalArgumentException("Invoice can only be generated when appointment is in BILLING status");
+            throw new IllegalArgumentException(
+                    "Invoice can only be generated when appointment is in BILLING status. Current status: " + appointment.getStatus()
+            );
         }
 
         Family family = appointment.getPatient().getFamily();
@@ -90,8 +92,10 @@ public class BillingService {
                 .findByDiagnosisAppointmentIdAndDispensedTrue(appointmentId);
 
         Map<String, Long> quantityByMedicineName = dispensedPrescriptions.stream()
+                .map(Prescription::getMedicineName)
+                .map(this::normalizeMedicineName)
                 .collect(Collectors.groupingBy(
-                        Prescription::getMedicineName,
+                        normalizedName -> normalizedName,
                         Collectors.counting()
                 ));
 
@@ -150,7 +154,9 @@ public class BillingService {
             Family family = invoice.getFamily();
             BigDecimal balance = family.getWalletBalance();
             if (balance.compareTo(invoice.getTotalAmount()) < 0) {
-                throw new InsufficientBalanceException("Insufficient wallet balance for invoice payment");
+                throw new InsufficientBalanceException(
+                        "Insufficient wallet balance: required " + invoice.getTotalAmount() + ", available " + balance
+                );
             }
 
             family.setWalletBalance(balance.subtract(invoice.getTotalAmount()).setScale(2, RoundingMode.HALF_UP));
@@ -213,5 +219,9 @@ public class BillingService {
                 invoice.getUpdatedAt(),
                 itemResponses
         );
+    }
+
+    private String normalizeMedicineName(String medicineName) {
+        return medicineName == null ? "" : medicineName.trim().toLowerCase();
     }
 }

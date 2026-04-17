@@ -95,10 +95,10 @@ class BillingCommissionIntegrationTest {
         FamilyResponse family = createFamily(center.getId(), "Billing Family");
         FamilyMemberResponse member = createFamilyMember(family.getHealthCardNumber());
 
-        createUser(RoleName.ASSOCIATE, "assoc-bill");
-        createUser(RoleName.BLOCK_MANAGER, "block-bill");
-        createUser(RoleName.DISTRICT_MANAGER, "district-bill");
-        createUser(RoleName.STATE_MANAGER, "state-bill");
+        User associate = createUser(RoleName.ASSOCIATE, "assoc-bill");
+        User blockManager = createUser(RoleName.BLOCK_MANAGER, "block-bill");
+        User districtManager = createUser(RoleName.DISTRICT_MANAGER, "district-bill");
+        User stateManager = createUser(RoleName.STATE_MANAGER, "state-bill");
         User superAdmin = createUser(RoleName.SUPER_ADMIN, "super-bill");
         User doctor = createUser(RoleName.DOCTOR, "doctor-bill");
 
@@ -124,6 +124,22 @@ class BillingCommissionIntegrationTest {
 
         FamilyResponse updatedFamily = familyService.getByHealthCardNumber(family.getHealthCardNumber());
         assertEquals(new BigDecimal("90.00"), updatedFamily.getWalletBalance());
+
+        List<CommissionLedgerResponse> associateCommissions = commissionService.getUserCommissions(associate.getId());
+        assertEquals(1, associateCommissions.size());
+        assertEquals(new BigDecimal("4.40"), associateCommissions.get(0).getAmount());
+
+        List<CommissionLedgerResponse> blockManagerCommissions = commissionService.getUserCommissions(blockManager.getId());
+        assertEquals(1, blockManagerCommissions.size());
+        assertEquals(new BigDecimal("3.30"), blockManagerCommissions.get(0).getAmount());
+
+        List<CommissionLedgerResponse> districtManagerCommissions = commissionService.getUserCommissions(districtManager.getId());
+        assertEquals(1, districtManagerCommissions.size());
+        assertEquals(new BigDecimal("2.20"), districtManagerCommissions.get(0).getAmount());
+
+        List<CommissionLedgerResponse> stateManagerCommissions = commissionService.getUserCommissions(stateManager.getId());
+        assertEquals(1, stateManagerCommissions.size());
+        assertEquals(new BigDecimal("1.10"), stateManagerCommissions.get(0).getAmount());
 
         List<CommissionLedgerResponse> superAdminCommissions = commissionService.getUserCommissions(superAdmin.getId());
         assertEquals(1, superAdminCommissions.size());

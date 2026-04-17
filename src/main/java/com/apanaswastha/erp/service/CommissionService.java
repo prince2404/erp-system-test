@@ -10,6 +10,8 @@ import com.apanaswastha.erp.entity.enums.RoleName;
 import com.apanaswastha.erp.repository.CommissionLedgerRepository;
 import com.apanaswastha.erp.repository.RoleRepository;
 import com.apanaswastha.erp.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,6 +22,8 @@ import java.util.Map;
 
 @Service
 public class CommissionService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommissionService.class);
 
     private static final Map<RoleName, BigDecimal> COMMISSION_DISTRIBUTION = new LinkedHashMap<>();
 
@@ -86,9 +90,18 @@ public class CommissionService {
 
     private User resolveRecipient(RoleName roleName) {
         if (roleName == RoleName.SUPER_ADMIN) {
-            return userRepository.findFirstByRoleNameAndIsDeletedFalseOrderByIdAsc(RoleName.SUPER_ADMIN)
-                    .or(() -> userRepository.findFirstByRoleNameAndIsDeletedFalseOrderByIdAsc(RoleName.ADMIN))
+            User superAdmin = userRepository.findFirstByRoleNameAndIsDeletedFalseOrderByIdAsc(RoleName.SUPER_ADMIN)
                     .orElse(null);
+            if (superAdmin != null) {
+                return superAdmin;
+            }
+
+            User adminFallback = userRepository.findFirstByRoleNameAndIsDeletedFalseOrderByIdAsc(RoleName.ADMIN)
+                    .orElse(null);
+            if (adminFallback != null) {
+                LOGGER.warn("No SUPER_ADMIN user found. Falling back platform commission recipient to ADMIN user id={}", adminFallback.getId());
+            }
+            return adminFallback;
         }
 
         return userRepository.findFirstByRoleNameAndIsDeletedFalseOrderByIdAsc(roleName)
