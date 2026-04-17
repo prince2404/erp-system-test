@@ -75,7 +75,7 @@ const DistrictsPage = () => {
       {isLoading ? (
         <p className="text-sm text-slate-600">Loading districts...</p>
       ) : (
-        <DataTable columns={columns} rows={districts} />
+        <DataTable columns={columns} rows={districts} getRowKey={(district) => district.id} />
       )}
 
       <Modal title="Create District" isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>

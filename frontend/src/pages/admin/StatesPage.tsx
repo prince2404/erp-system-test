@@ -55,7 +55,7 @@ const StatesPage = () => {
         ) : null}
       </div>
 
-      {isLoading ? <p className="text-sm text-slate-600">Loading states...</p> : <DataTable columns={columns} rows={states} />}
+      {isLoading ? <p className="text-sm text-slate-600">Loading states...</p> : <DataTable columns={columns} rows={states} getRowKey={(state) => state.id} />}
 
       <Modal title="Create State" isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>

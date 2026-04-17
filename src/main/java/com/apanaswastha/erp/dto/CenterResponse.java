@@ -1,5 +1,7 @@
 package com.apanaswastha.erp.dto;
 
+import com.apanaswastha.erp.entity.enums.CenterType;
+
 import java.time.Instant;
 
 public class CenterResponse {
@@ -7,6 +9,7 @@ public class CenterResponse {
     private final Long id;
     private final String name;
     private final String centerCode;
+    private final CenterType type;
     private final Long blockId;
     private final String address;
     private final String contactNumber;
@@ -17,6 +20,7 @@ public class CenterResponse {
             Long id,
             String name,
             String centerCode,
+            CenterType type,
             Long blockId,
             String address,
             String contactNumber,
@@ -26,6 +30,7 @@ public class CenterResponse {
         this.id = id;
         this.name = name;
         this.centerCode = centerCode;
+        this.type = type;
         this.blockId = blockId;
         this.address = address;
         this.contactNumber = contactNumber;
@@ -43,6 +48,10 @@ public class CenterResponse {
 
     public String getCenterCode() {
         return centerCode;
+    }
+
+    public CenterType getType() {
+        return type;
     }
 
     public Long getBlockId() {

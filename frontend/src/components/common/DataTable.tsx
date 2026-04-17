@@ -11,9 +11,16 @@ type DataTableProps<T> = {
   rows: T[]
   pageSize?: number
   emptyText?: string
+  getRowKey?: (row: T) => string | number
 }
 
-const DataTable = <T,>({ columns, rows, pageSize = 10, emptyText = 'No records found.' }: DataTableProps<T>) => {
+const DataTable = <T,>({
+  columns,
+  rows,
+  pageSize = 10,
+  emptyText = 'No records found.',
+  getRowKey,
+}: DataTableProps<T>) => {
   const [currentPage, setCurrentPage] = useState(1)
 
   const totalPages = Math.max(1, Math.ceil(rows.length / pageSize))
@@ -44,7 +51,7 @@ const DataTable = <T,>({ columns, rows, pageSize = 10, emptyText = 'No records f
           <tbody className="divide-y divide-slate-100">
             {pagedRows.length > 0 ? (
               pagedRows.map((row, rowIndex) => (
-                <tr key={rowIndex} className="hover:bg-slate-50">
+                <tr key={getRowKey ? getRowKey(row) : rowIndex} className="hover:bg-slate-50">
                   {columns.map((column) => (
                     <td key={column.key} className="px-4 py-3 text-slate-700">
                       {column.accessor(row)}

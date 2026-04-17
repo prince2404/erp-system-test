@@ -1,5 +1,6 @@
 package com.apanaswastha.erp.dto;
 
+import com.apanaswastha.erp.entity.enums.CenterType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -10,6 +11,8 @@ public class CreateCenterRequest {
 
     @NotBlank
     private String centerCode;
+
+    private CenterType type;
 
     @NotNull
     private Long blockId;
@@ -42,6 +45,14 @@ public class CreateCenterRequest {
 
     public void setBlockId(Long blockId) {
         this.blockId = blockId;
+    }
+
+    public CenterType getType() {
+        return type;
+    }
+
+    public void setType(CenterType type) {
+        this.type = type;
     }
 
     public String getAddress() {

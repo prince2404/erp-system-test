@@ -72,7 +72,7 @@ const BlocksPage = () => {
         ) : null}
       </div>
 
-      {isLoading ? <p className="text-sm text-slate-600">Loading blocks...</p> : <DataTable columns={columns} rows={blocks} />}
+      {isLoading ? <p className="text-sm text-slate-600">Loading blocks...</p> : <DataTable columns={columns} rows={blocks} getRowKey={(block) => block.id} />}
 
       <Modal title="Create Block" isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>

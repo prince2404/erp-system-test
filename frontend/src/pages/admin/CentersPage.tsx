@@ -34,6 +34,7 @@ const CentersPage = () => {
   const columns: Column<CenterItem>[] = useMemo(
     () => [
       { key: 'name', header: 'Name', accessor: (center) => center.name },
+      { key: 'type', header: 'Type', accessor: (center) => center.type },
       { key: 'code', header: 'Code', accessor: (center) => center.centerCode },
       {
         key: 'block',
@@ -59,6 +60,7 @@ const CentersPage = () => {
     await createCenter.mutateAsync({
       name: values.name,
       centerCode: values.centerCode,
+      type: values.type,
       blockId: Number(values.blockId),
       address: values.address,
       contactNumber: values.contactNumber,
@@ -84,7 +86,7 @@ const CentersPage = () => {
         ) : null}
       </div>
 
-      {isLoading ? <p className="text-sm text-slate-600">Loading centers...</p> : <DataTable columns={columns} rows={centers} />}
+      {isLoading ? <p className="text-sm text-slate-600">Loading centers...</p> : <DataTable columns={columns} rows={centers} getRowKey={(center) => center.id} />}
 
       <Modal title="Create Center" isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>

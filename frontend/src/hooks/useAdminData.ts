@@ -29,6 +29,7 @@ export type CenterItem = {
   id: number
   name: string
   centerCode: string
+  type: 'CLINIC' | 'HOSPITAL'
   blockId: number
   address: string
   contactNumber: string
@@ -57,6 +58,10 @@ type RegisterPayload = {
   email: string
   phone?: string
   roleId: number
+  assignedStateId?: number
+  assignedDistrictId?: number
+  assignedBlockId?: number
+  assignedCenterId?: number
 }
 
 const getStates = async () => {
@@ -165,6 +170,7 @@ export const useCreateCenter = () => {
     mutationFn: (payload: {
       name: string
       centerCode: string
+      type: 'CLINIC' | 'HOSPITAL'
       blockId: number
       address: string
       contactNumber: string

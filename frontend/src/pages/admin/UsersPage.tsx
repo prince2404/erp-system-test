@@ -107,6 +107,17 @@ const UsersPage = () => {
 
   const onSubmit = async (values: FormValues) => {
     const roleId = ROLE_ID_BY_NAME[values.role]
+    const assignedEntityId = values.assignedEntityId ? Number(values.assignedEntityId) : undefined
+    const assignedPayload =
+      assignmentScope === 'state'
+        ? { assignedStateId: assignedEntityId }
+        : assignmentScope === 'district'
+          ? { assignedDistrictId: assignedEntityId }
+          : assignmentScope === 'block'
+            ? { assignedBlockId: assignedEntityId }
+            : assignmentScope === 'center'
+              ? { assignedCenterId: assignedEntityId }
+              : {}
 
     await createUser.mutateAsync({
       username: values.username,
@@ -114,6 +125,7 @@ const UsersPage = () => {
       email: values.email,
       phone: values.phone,
       roleId,
+      ...assignedPayload,
     })
 
     reset({ role: 'STATE_MANAGER' })
@@ -141,7 +153,7 @@ const UsersPage = () => {
         </button>
       </div>
 
-      {isLoading ? <p className="text-sm text-slate-600">Loading users...</p> : <DataTable columns={columns} rows={users} />}
+      {isLoading ? <p className="text-sm text-slate-600">Loading users...</p> : <DataTable columns={columns} rows={users} getRowKey={(user) => user.id} />}
 
       <Modal title="Create User" isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>

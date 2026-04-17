@@ -19,6 +19,14 @@ public class RegisterRequest {
 
     private Long roleId;
 
+    private Long assignedStateId;
+
+    private Long assignedDistrictId;
+
+    private Long assignedBlockId;
+
+    private Long assignedCenterId;
+
     public String getUsername() {
         return username;
     }
@@ -57,5 +65,37 @@ public class RegisterRequest {
 
     public void setRoleId(Long roleId) {
         this.roleId = roleId;
+    }
+
+    public Long getAssignedStateId() {
+        return assignedStateId;
+    }
+
+    public void setAssignedStateId(Long assignedStateId) {
+        this.assignedStateId = assignedStateId;
+    }
+
+    public Long getAssignedDistrictId() {
+        return assignedDistrictId;
+    }
+
+    public void setAssignedDistrictId(Long assignedDistrictId) {
+        this.assignedDistrictId = assignedDistrictId;
+    }
+
+    public Long getAssignedBlockId() {
+        return assignedBlockId;
+    }
+
+    public void setAssignedBlockId(Long assignedBlockId) {
+        this.assignedBlockId = assignedBlockId;
+    }
+
+    public Long getAssignedCenterId() {
+        return assignedCenterId;
+    }
+
+    public void setAssignedCenterId(Long assignedCenterId) {
+        this.assignedCenterId = assignedCenterId;
     }
 }

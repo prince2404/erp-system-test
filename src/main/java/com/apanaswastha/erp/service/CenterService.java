@@ -4,6 +4,7 @@ import com.apanaswastha.erp.dto.CenterResponse;
 import com.apanaswastha.erp.dto.CreateCenterRequest;
 import com.apanaswastha.erp.entity.Block;
 import com.apanaswastha.erp.entity.Center;
+import com.apanaswastha.erp.entity.enums.CenterType;
 import com.apanaswastha.erp.exception.NotFoundException;
 import com.apanaswastha.erp.repository.BlockRepository;
 import com.apanaswastha.erp.repository.CenterRepository;
@@ -29,6 +30,7 @@ public class CenterService {
         Center center = new Center();
         center.setName(request.getName());
         center.setCenterCode(request.getCenterCode());
+        center.setCenterType(request.getType() != null ? request.getType() : CenterType.CLINIC);
         center.setBlock(block);
         center.setAddress(request.getAddress());
         center.setContactNumber(request.getContactNumber());
@@ -53,6 +55,7 @@ public class CenterService {
                 center.getId(),
                 center.getName(),
                 center.getCenterCode(),
+                center.getCenterType(),
                 center.getBlock().getId(),
                 center.getAddress(),
                 center.getContactNumber(),
