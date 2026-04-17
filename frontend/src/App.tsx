@@ -4,6 +4,11 @@ import ProtectedRoute from './components/routing/ProtectedRoute'
 import DashboardLayout from './components/layout/DashboardLayout'
 import LoginPage from './pages/LoginPage'
 import DashboardHomePage from './pages/DashboardHomePage'
+import StatesPage from './pages/admin/StatesPage'
+import DistrictsPage from './pages/admin/DistrictsPage'
+import BlocksPage from './pages/admin/BlocksPage'
+import CentersPage from './pages/admin/CentersPage'
+import UsersPage from './pages/admin/UsersPage'
 
 const queryClient = new QueryClient()
 
@@ -15,8 +20,13 @@ const App = () => {
           <Route path="/login" element={<LoginPage />} />
 
           <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<DashboardLayout />}>
-              <Route index element={<DashboardHomePage />} />
+            <Route element={<DashboardLayout />}>
+              <Route path="/dashboard" element={<DashboardHomePage />} />
+              <Route path="/admin/states" element={<StatesPage />} />
+              <Route path="/admin/districts" element={<DistrictsPage />} />
+              <Route path="/admin/blocks" element={<BlocksPage />} />
+              <Route path="/admin/centers" element={<CentersPage />} />
+              <Route path="/admin/users" element={<UsersPage />} />
             </Route>
           </Route>
 
