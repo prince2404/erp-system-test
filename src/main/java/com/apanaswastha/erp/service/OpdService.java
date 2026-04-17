@@ -45,6 +45,7 @@ public class OpdService {
     private final FamilyMemberRepository familyMemberRepository;
     private final CenterRepository centerRepository;
     private final UserRepository userRepository;
+    private final InventoryService inventoryService;
 
     public OpdService(
             AppointmentRepository appointmentRepository,
@@ -52,7 +53,8 @@ public class OpdService {
             PrescriptionRepository prescriptionRepository,
             FamilyMemberRepository familyMemberRepository,
             CenterRepository centerRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            InventoryService inventoryService
     ) {
         this.appointmentRepository = appointmentRepository;
         this.diagnosisRepository = diagnosisRepository;
@@ -60,6 +62,7 @@ public class OpdService {
         this.familyMemberRepository = familyMemberRepository;
         this.centerRepository = centerRepository;
         this.userRepository = userRepository;
+        this.inventoryService = inventoryService;
     }
 
     @Transactional
@@ -153,6 +156,8 @@ public class OpdService {
                 .orElseThrow(() -> new NotFoundException("Prescription not found with id: " + prescriptionId));
 
         if (!prescription.isDispensed()) {
+            Long centerId = prescription.getDiagnosis().getAppointment().getCenter().getId();
+            inventoryService.dispenseMedicine(centerId, prescription.getMedicineName(), 1);
             prescription.setDispensed(true);
             prescription = prescriptionRepository.save(prescription);
         }
