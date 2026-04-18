@@ -129,6 +129,40 @@ class OpdServiceIntegrationTest {
         assertTrue(dispensed.isDispensed());
     }
 
+    @Test
+    void shouldAllowConsultationCompletionToBillingAfterDiagnosis() {
+        CenterResponse center = createCenterHierarchy();
+        FamilyMemberResponse patient = createFamilyAndMember(center.getId());
+        User doctor = createDoctor();
+
+        CreateAppointmentRequest appointmentRequest = new CreateAppointmentRequest();
+        appointmentRequest.setCenterId(center.getId());
+        appointmentRequest.setPatientId(patient.getId());
+        appointmentRequest.setDoctorId(doctor.getId());
+        appointmentRequest.setAppointmentDate(LocalDate.now());
+        appointmentRequest.setChiefComplaint("High fever since yesterday");
+
+        AppointmentResponse appointment = opdService.createAppointment(appointmentRequest);
+        assertEquals("High fever since yesterday", appointment.getChiefComplaint());
+
+        opdService.updateAppointmentStatus(appointment.getId(), AppointmentStatus.IN_CONSULTATION);
+
+        CreateDiagnosisRequest diagnosisRequest = new CreateDiagnosisRequest();
+        diagnosisRequest.setSymptoms("High fever");
+        diagnosisRequest.setMedicalNotes("Need hydration and monitoring");
+
+        PrescriptionItemRequest prescriptionItemRequest = new PrescriptionItemRequest();
+        prescriptionItemRequest.setMedicineName("Paracetamol");
+        prescriptionItemRequest.setDosage("500mg");
+        prescriptionItemRequest.setDuration("2 days");
+        diagnosisRequest.setPrescriptions(List.of(prescriptionItemRequest));
+
+        opdService.addDiagnosis(appointment.getId(), diagnosisRequest);
+
+        AppointmentResponse billing = opdService.updateAppointmentStatus(appointment.getId(), AppointmentStatus.BILLING);
+        assertEquals(AppointmentStatus.BILLING, billing.getStatus());
+    }
+
     private void seedInventory(Long centerId, String medicineName) {
         CreateMedicineRequest medicineRequest = new CreateMedicineRequest();
         medicineRequest.setName(medicineName);

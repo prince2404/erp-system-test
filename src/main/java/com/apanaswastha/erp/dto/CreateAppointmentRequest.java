@@ -1,6 +1,7 @@
 package com.apanaswastha.erp.dto;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
@@ -17,6 +18,9 @@ public class CreateAppointmentRequest {
 
     @NotNull
     private LocalDate appointmentDate;
+
+    @Size(max = 1000)
+    private String chiefComplaint;
 
     public Long getPatientId() {
         return patientId;
@@ -48,5 +52,13 @@ public class CreateAppointmentRequest {
 
     public void setAppointmentDate(LocalDate appointmentDate) {
         this.appointmentDate = appointmentDate;
+    }
+
+    public String getChiefComplaint() {
+        return chiefComplaint;
+    }
+
+    public void setChiefComplaint(String chiefComplaint) {
+        this.chiefComplaint = chiefComplaint;
     }
 }

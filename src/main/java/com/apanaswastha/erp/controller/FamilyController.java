@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/families")
 public class FamilyController {
@@ -30,6 +32,11 @@ public class FamilyController {
     public ResponseEntity<ApiResponse<FamilyResponse>> registerFamily(@Valid @RequestBody CreateFamilyRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Family registered successfully", familyService.registerFamily(request)));
+    }
+
+    @GetMapping
+    public ApiResponse<List<FamilyResponse>> listFamilies() {
+        return ApiResponse.success("Families fetched successfully", familyService.getAllFamilies());
     }
 
     @PostMapping("/{healthCardNumber}/members")

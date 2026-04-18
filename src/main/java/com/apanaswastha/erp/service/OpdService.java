@@ -33,7 +33,7 @@ public class OpdService {
 
     private static final Map<AppointmentStatus, EnumSet<AppointmentStatus>> ALLOWED_TRANSITIONS = Map.of(
             AppointmentStatus.WAITING, EnumSet.of(AppointmentStatus.IN_CONSULTATION),
-            AppointmentStatus.IN_CONSULTATION, EnumSet.of(AppointmentStatus.PHARMACY),
+            AppointmentStatus.IN_CONSULTATION, EnumSet.of(AppointmentStatus.PHARMACY, AppointmentStatus.BILLING),
             AppointmentStatus.PHARMACY, EnumSet.of(AppointmentStatus.BILLING),
             AppointmentStatus.BILLING, EnumSet.of(AppointmentStatus.COMPLETED),
             AppointmentStatus.COMPLETED, EnumSet.noneOf(AppointmentStatus.class)
@@ -89,8 +89,33 @@ public class OpdService {
         appointment.setAppointmentDate(request.getAppointmentDate());
         appointment.setStatus(AppointmentStatus.WAITING);
         appointment.setTokenNumber(String.valueOf(tokenSequence));
+        appointment.setChiefComplaint(request.getChiefComplaint());
 
         return toAppointmentResponse(appointmentRepository.save(appointment));
+    }
+
+    @Transactional(readOnly = true)
+    public List<AppointmentResponse> getAppointments(Long doctorId, AppointmentStatus status) {
+        List<Appointment> appointments;
+
+        if (doctorId != null && status != null) {
+            appointments = appointmentRepository.findByDoctorIdAndStatusOrderByCreatedAtAsc(doctorId, status);
+        } else if (doctorId != null) {
+            appointments = appointmentRepository.findByDoctorIdOrderByCreatedAtAsc(doctorId);
+        } else if (status != null) {
+            appointments = appointmentRepository.findByStatusOrderByCreatedAtAsc(status);
+        } else {
+            appointments = appointmentRepository.findAllByOrderByCreatedAtDesc();
+        }
+
+        return appointments.stream().map(this::toAppointmentResponse).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public AppointmentResponse getAppointmentById(Long appointmentId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new NotFoundException("Appointment not found with id: " + appointmentId));
+        return toAppointmentResponse(appointment);
     }
 
     @Transactional
@@ -183,6 +208,7 @@ public class OpdService {
                 appointment.getTokenNumber(),
                 appointment.getStatus(),
                 appointment.getAppointmentDate(),
+                appointment.getChiefComplaint(),
                 appointment.getCreatedAt(),
                 appointment.getUpdatedAt()
         );

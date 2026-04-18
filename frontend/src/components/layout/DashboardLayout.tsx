@@ -12,6 +12,11 @@ const DashboardLayout = () => {
     navigate('/login', { replace: true })
   }
 
+  const role = currentUser?.role
+  const isSuperAdmin = role === 'SUPER_ADMIN'
+  const canSeeReceptionNav = role === 'RECEPTIONIST' || isSuperAdmin
+  const canSeeDoctorNav = role === 'DOCTOR' || isSuperAdmin
+
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900">
       <div className="flex min-h-screen">
@@ -61,6 +66,44 @@ const DashboardLayout = () => {
             >
               Centers
             </NavLink>
+            {canSeeReceptionNav ? (
+              <>
+                <NavLink
+                  to="/reception/families"
+                  className={({ isActive }) =>
+                    `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
+                  }
+                >
+                  Families
+                </NavLink>
+                <NavLink
+                  to="/reception/patients"
+                  className={({ isActive }) =>
+                    `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
+                  }
+                >
+                  Patients
+                </NavLink>
+                <NavLink
+                  to="/reception/appointments"
+                  className={({ isActive }) =>
+                    `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
+                  }
+                >
+                  Appointments
+                </NavLink>
+              </>
+            ) : null}
+            {canSeeDoctorNav ? (
+              <NavLink
+                to="/doctor/queue"
+                className={({ isActive }) =>
+                  `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
+                }
+              >
+                OPD Queue
+              </NavLink>
+            ) : null}
             {canAccessUsers(currentUser?.role) ? (
               <NavLink
                 to="/admin/users"
