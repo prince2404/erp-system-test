@@ -39,6 +39,7 @@ export type UserProfile = {
   id: number
   username: string
   role: string
+  assignedCenterId: number | null
 }
 
 export type UserSummary = {

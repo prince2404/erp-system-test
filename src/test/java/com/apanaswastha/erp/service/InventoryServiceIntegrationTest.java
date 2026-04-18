@@ -10,6 +10,7 @@ import com.apanaswastha.erp.dto.CreateMedicineRequest;
 import com.apanaswastha.erp.dto.CreateStateRequest;
 import com.apanaswastha.erp.dto.DistrictResponse;
 import com.apanaswastha.erp.dto.InventoryBatchResponse;
+import com.apanaswastha.erp.dto.MedicineResponse;
 import com.apanaswastha.erp.entity.InventoryBatch;
 import com.apanaswastha.erp.entity.Vendor;
 import com.apanaswastha.erp.exception.InsufficientStockException;
@@ -27,6 +28,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -101,6 +103,22 @@ class InventoryServiceIntegrationTest {
         assertEquals(2, in60Days.size());
         assertEquals("EXP-20", in60Days.get(0).getBatchNumber());
         assertEquals("EXP-45", in60Days.get(1).getBatchNumber());
+    }
+
+    @Test
+    void shouldListMedicinesAndCenterBatches() {
+        CenterResponse center = createCenterHierarchy("INV-LIST");
+        Long medicineId = createMedicine("Cetirizine");
+        Long vendorId = createVendor("Vendor C");
+
+        inventoryService.addBatch(createBatchRequest(center.getId(), medicineId, vendorId, "LIST-001", LocalDate.now().plusDays(25), 12));
+
+        List<MedicineResponse> medicines = inventoryService.getMedicines();
+        List<InventoryBatchResponse> batches = inventoryService.getCenterBatches(center.getId());
+
+        assertTrue(medicines.stream().anyMatch(medicine -> medicine.getName().equals("Cetirizine")));
+        assertEquals(1, batches.size());
+        assertEquals("LIST-001", batches.get(0).getBatchNumber());
     }
 
     private Long createMedicine(String name) {

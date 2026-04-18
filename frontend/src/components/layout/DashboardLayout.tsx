@@ -17,6 +17,7 @@ const DashboardLayout = () => {
   const canSeeReceptionNav = role === 'RECEPTIONIST' || isSuperAdmin
   const canSeeBillingNav = role === 'RECEPTIONIST' || role === 'CASHIER' || isSuperAdmin
   const canSeeDoctorNav = role === 'DOCTOR' || isSuperAdmin
+  const canSeePharmacyNav = role === 'PHARMACIST' || isSuperAdmin
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900">
@@ -122,6 +123,26 @@ const DashboardLayout = () => {
                   }
                 >
                   Wallet Top-Up
+                </NavLink>
+              </>
+            ) : null}
+            {canSeePharmacyNav ? (
+              <>
+                <NavLink
+                  to="/pharmacy/medicines"
+                  className={({ isActive }) =>
+                    `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
+                  }
+                >
+                  Medicine Catalog
+                </NavLink>
+                <NavLink
+                  to="/pharmacy/inventory"
+                  className={({ isActive }) =>
+                    `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
+                  }
+                >
+                  Inventory
                 </NavLink>
               </>
             ) : null}
