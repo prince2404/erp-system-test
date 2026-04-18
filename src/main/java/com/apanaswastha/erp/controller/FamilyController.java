@@ -6,6 +6,9 @@ import com.apanaswastha.erp.dto.FamilyMemberResponse;
 import com.apanaswastha.erp.dto.FamilyResponse;
 import com.apanaswastha.erp.payload.ApiResponse;
 import com.apanaswastha.erp.service.FamilyService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/families")
+@Tag(name = "Patients", description = "Patient and family management APIs")
 public class FamilyController {
 
     private final FamilyService familyService;
@@ -29,17 +33,31 @@ public class FamilyController {
     }
 
     @PostMapping
+    @Operation(summary = "Register patient family", description = "Registers a new patient family record")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Family registered successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid request payload")
+    })
     public ResponseEntity<ApiResponse<FamilyResponse>> registerFamily(@Valid @RequestBody CreateFamilyRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Family registered successfully", familyService.registerFamily(request)));
     }
 
     @GetMapping
+    @Operation(summary = "List patient families", description = "Returns all registered patient families")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Families fetched successfully")
+    })
     public ApiResponse<List<FamilyResponse>> listFamilies() {
         return ApiResponse.success("Families fetched successfully", familyService.getAllFamilies());
     }
 
     @PostMapping("/{healthCardNumber}/members")
+    @Operation(summary = "Add family member", description = "Adds a member to an existing patient family")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Family member added successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Family not found")
+    })
     public ResponseEntity<ApiResponse<FamilyMemberResponse>> addMember(
             @PathVariable String healthCardNumber,
             @Valid @RequestBody CreateFamilyMemberRequest request
@@ -49,6 +67,11 @@ public class FamilyController {
     }
 
     @GetMapping("/{healthCardNumber}")
+    @Operation(summary = "Get family by health card number", description = "Fetches patient family details using health card number")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Family fetched successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Family not found")
+    })
     public ApiResponse<FamilyResponse> getByHealthCardNumber(@PathVariable String healthCardNumber) {
         return ApiResponse.success("Family fetched successfully", familyService.getByHealthCardNumber(healthCardNumber));
     }
