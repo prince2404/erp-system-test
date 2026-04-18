@@ -6,6 +6,13 @@ import Modal from '../../components/common/Modal'
 import { useCenters, useCurrentUser } from '../../hooks/useAdminData'
 import { useAddStock, useInventory, useMedicines } from '../../hooks/usePharmacyData'
 
+const toLocalIsoDate = (date: Date) => {
+  const timezoneOffsetMs = date.getTimezoneOffset() * 60 * 1000
+  return new Date(date.getTime() - timezoneOffsetMs).toISOString().slice(0, 10)
+}
+
+const TODAY_LOCAL_ISO_DATE = toLocalIsoDate(new Date())
+
 const batchSchema = z.object({
   medicineId: z.string().min(1, 'Medicine is required'),
   vendorId: z.string().min(1, 'Vendor ID is required'),
@@ -21,7 +28,7 @@ const batchSchema = z.object({
   expiryDate: z
     .string()
     .min(1, 'Expiry date is required')
-    .refine((value) => new Date(`${value}T00:00:00`).getTime() > Date.now(), 'Expiry date must be in the future'),
+    .refine((value) => value >= TODAY_LOCAL_ISO_DATE, 'Expiry date cannot be in the past'),
   cost: z
     .string()
     .trim()
@@ -30,7 +37,6 @@ const batchSchema = z.object({
 })
 
 type BatchFormValues = z.infer<typeof batchSchema>
-const TODAY_ISO_DATE = new Date().toISOString().slice(0, 10)
 
 const InventoryPage = () => {
   const { data: currentUser } = useCurrentUser()
@@ -135,7 +141,7 @@ const InventoryPage = () => {
             <tbody className="divide-y divide-slate-100">
               {batches.length > 0 ? (
                 batches.map((batch) => {
-                  const isExpired = batch.expiryDate < TODAY_ISO_DATE
+                  const isExpired = batch.expiryDate < TODAY_LOCAL_ISO_DATE
                   const isLowStock = batch.quantityAvailable < 50
                   const rowClassName = isExpired
                     ? 'bg-rose-50'
