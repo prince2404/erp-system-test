@@ -60,11 +60,12 @@ docker-compose up -d
 ### Authentication / First User
 
 No hardcoded default credentials are shipped.
-Use `POST /api/auth/register` (or `/api/v1/auth/register`) to create the first user, then log in with `POST /api/auth/login`.
+Use `POST /api/auth/register` to create the first user, then log in with `POST /api/auth/login`.
+`/api/v1/auth/*` is also supported as a versioned alias.
 
 ## Screenshots
 
-> Replace these placeholders with real product screenshots.
+> Placeholder image paths are pre-wired under `docs/`. Replace with real screenshots when available.
 
 ![Dashboard Placeholder](docs/dashboard.png)
 ![Patient Management Placeholder](docs/patient-management.png)
