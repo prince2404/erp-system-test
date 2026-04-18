@@ -14,6 +14,7 @@ public class AppointmentResponse {
     private final String tokenNumber;
     private final AppointmentStatus status;
     private final LocalDate appointmentDate;
+    private final String chiefComplaint;
     private final Instant createdAt;
     private final Instant updatedAt;
 
@@ -25,6 +26,7 @@ public class AppointmentResponse {
             String tokenNumber,
             AppointmentStatus status,
             LocalDate appointmentDate,
+            String chiefComplaint,
             Instant createdAt,
             Instant updatedAt
     ) {
@@ -35,6 +37,7 @@ public class AppointmentResponse {
         this.tokenNumber = tokenNumber;
         this.status = status;
         this.appointmentDate = appointmentDate;
+        this.chiefComplaint = chiefComplaint;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -65,6 +68,10 @@ public class AppointmentResponse {
 
     public LocalDate getAppointmentDate() {
         return appointmentDate;
+    }
+
+    public String getChiefComplaint() {
+        return chiefComplaint;
     }
 
     public Instant getCreatedAt() {

@@ -1,11 +1,13 @@
 package com.apanaswastha.erp.repository;
 
 import com.apanaswastha.erp.entity.Appointment;
+import com.apanaswastha.erp.entity.enums.AppointmentStatus;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
@@ -27,4 +29,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             @Param("blockId") Long blockId,
             @Param("centerId") Long centerId
     );
+
+    List<Appointment> findByDoctorIdAndStatusOrderByCreatedAtAsc(Long doctorId, AppointmentStatus status);
+
+    List<Appointment> findByDoctorIdOrderByCreatedAtAsc(Long doctorId);
+
+    List<Appointment> findByStatusOrderByCreatedAtAsc(AppointmentStatus status);
+
+    List<Appointment> findAllByOrderByCreatedAtDesc();
 }

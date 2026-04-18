@@ -81,6 +81,12 @@ public class FamilyService {
         return toFamilyResponse(family);
     }
 
+    public List<FamilyResponse> getAllFamilies() {
+        return familyRepository.findAllByOrderByCreatedAtDesc().stream()
+                .map(this::toFamilyResponse)
+                .toList();
+    }
+
     private FamilyResponse toFamilyResponse(Family family) {
         List<FamilyMemberResponse> members = familyMemberRepository.findAllByFamilyId(family.getId()).stream()
                 .map(this::toMemberResponse)

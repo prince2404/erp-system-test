@@ -9,6 +9,11 @@ import DistrictsPage from './pages/admin/DistrictsPage'
 import BlocksPage from './pages/admin/BlocksPage'
 import CentersPage from './pages/admin/CentersPage'
 import UsersPage from './pages/admin/UsersPage'
+import FamiliesPage from './pages/reception/FamiliesPage'
+import PatientsPage from './pages/reception/PatientsPage'
+import AppointmentsPage from './pages/reception/AppointmentsPage'
+import DoctorQueuePage from './pages/doctor/DoctorQueuePage'
+import DoctorConsultationPage from './pages/doctor/DoctorConsultationPage'
 
 const queryClient = new QueryClient()
 
@@ -27,6 +32,11 @@ const App = () => {
               <Route path="/admin/blocks" element={<BlocksPage />} />
               <Route path="/admin/centers" element={<CentersPage />} />
               <Route path="/admin/users" element={<UsersPage />} />
+              <Route path="/reception/families" element={<FamiliesPage />} />
+              <Route path="/reception/patients" element={<PatientsPage />} />
+              <Route path="/reception/appointments" element={<AppointmentsPage />} />
+              <Route path="/doctor/queue" element={<DoctorQueuePage />} />
+              <Route path="/doctor/consultation/:appointmentId" element={<DoctorConsultationPage />} />
             </Route>
           </Route>
 
