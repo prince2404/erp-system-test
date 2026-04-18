@@ -23,7 +23,7 @@ public class UserController {
     @GetMapping("/me")
     public ApiResponse<UserProfile> me(Authentication authentication) {
         UserProfile profile = userRepository.findByUsernameAndIsDeletedFalse(authentication.getName())
-                .map(user -> new UserProfile(user.getUsername(), user.getRole().getName().name()))
+                .map(user -> new UserProfile(user.getId(), user.getUsername(), user.getRole().getName().name()))
                 .orElseThrow(() -> new IllegalArgumentException("Current user not found"));
         return ApiResponse.success("Current user fetched", profile);
     }
@@ -45,6 +45,6 @@ public class UserController {
     public record UserSummary(Long id, String username, String email, String phone, String role) {
     }
 
-    public record UserProfile(String username, String role) {
+    public record UserProfile(Long id, String username, String role) {
     }
 }

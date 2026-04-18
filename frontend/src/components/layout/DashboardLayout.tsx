@@ -15,6 +15,7 @@ const DashboardLayout = () => {
   const role = currentUser?.role
   const isSuperAdmin = role === 'SUPER_ADMIN'
   const canSeeReceptionNav = role === 'RECEPTIONIST' || isSuperAdmin
+  const canSeeBillingNav = role === 'RECEPTIONIST' || role === 'CASHIER' || isSuperAdmin
   const canSeeDoctorNav = role === 'DOCTOR' || isSuperAdmin
 
   return (
@@ -104,6 +105,34 @@ const DashboardLayout = () => {
                 OPD Queue
               </NavLink>
             ) : null}
+            {canSeeBillingNav ? (
+              <>
+                <NavLink
+                  to="/billing/invoices"
+                  className={({ isActive }) =>
+                    `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
+                  }
+                >
+                  Billing Invoices
+                </NavLink>
+                <NavLink
+                  to="/billing/wallet-topup"
+                  className={({ isActive }) =>
+                    `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
+                  }
+                >
+                  Wallet Top-Up
+                </NavLink>
+              </>
+            ) : null}
+            <NavLink
+              to="/commissions/ledger"
+              className={({ isActive }) =>
+                `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
+              }
+            >
+              Commission Ledger
+            </NavLink>
             {canAccessUsers(currentUser?.role) ? (
               <NavLink
                 to="/admin/users"

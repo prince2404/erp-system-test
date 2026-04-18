@@ -184,6 +184,16 @@ public class BillingService {
         return toResponse(invoice);
     }
 
+    public List<InvoiceResponse> listInvoices(PaymentStatus status) {
+        List<Invoice> invoices = status == null
+                ? invoiceRepository.findAllByOrderByCreatedAtDesc()
+                : invoiceRepository.findByPaymentStatusOrderByCreatedAtDesc(status);
+
+        return invoices.stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
     private InvoiceItem createConsultationItem(Invoice invoice, Appointment appointment) {
         InvoiceItem item = new InvoiceItem();
         item.setInvoice(invoice);
