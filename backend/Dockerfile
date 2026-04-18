@@ -1,17 +1,25 @@
-FROM maven:3.9.9-eclipse-temurin-17 AS build
+# Stage 1: Build using a pure Ubuntu-based Java image
+FROM eclipse-temurin:17-jdk-jammy AS build
 WORKDIR /app
 
+# Install standard Maven directly from Ubuntu repositories
+RUN apt-get update && apt-get install -y maven
+
+# Copy your pom.xml and source code
 COPY pom.xml .
-RUN mvn -q dependency:go-offline
 COPY src ./src
 
-RUN mvn -q -DskipTests package
+# Build the application using the installed Maven
+RUN mvn -B -DskipTests clean package
 
-FROM eclipse-temurin:17-jre-alpine
+# Stage 2: Run the application
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 
+# Copy the built JAR from the build stage
 COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+# Start the Spring Boot application
+ENTRYPOINT ["java", "-jar", "app.jar"]
