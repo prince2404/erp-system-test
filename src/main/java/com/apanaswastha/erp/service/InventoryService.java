@@ -53,6 +53,14 @@ public class InventoryService {
         return toMedicineResponse(medicineRepository.save(medicine));
     }
 
+    public List<MedicineResponse> getMedicines() {
+        return medicineRepository.findAll()
+                .stream()
+                .map(this::toMedicineResponse)
+                .sorted(Comparator.comparing(MedicineResponse::getName))
+                .toList();
+    }
+
     @Transactional
     public InventoryBatchResponse addBatch(CreateInventoryBatchRequest request) {
         Medicine medicine = medicineRepository.findById(request.getMedicineId())
@@ -100,6 +108,22 @@ public class InventoryService {
                 .entrySet().stream()
                 .map(entry -> new CenterStockResponse(entry.getKey(), entry.getValue(), stockByMedicine.get(entry.getKey())))
                 .sorted(Comparator.comparing(CenterStockResponse::getMedicineName))
+                .toList();
+    }
+
+    public List<InventoryBatchResponse> getCenterBatches(Long centerId) {
+        centerRepository.findById(centerId)
+                .orElseThrow(() -> new NotFoundException("Center not found with id: " + centerId));
+
+        return inventoryBatchRepository.findByCenterIdAndQuantityAvailableGreaterThan(centerId, 0)
+                .stream()
+                .sorted(
+                        Comparator
+                                .comparing(InventoryBatch::getExpiryDate)
+                                .thenComparing(InventoryBatch::getCreatedAt)
+                                .thenComparing(InventoryBatch::getId)
+                )
+                .map(this::toBatchResponse)
                 .toList();
     }
 

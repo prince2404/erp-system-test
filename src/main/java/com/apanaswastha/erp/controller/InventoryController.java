@@ -36,6 +36,11 @@ public class InventoryController {
                 .body(ApiResponse.success("Medicine added successfully", inventoryService.addMedicine(request)));
     }
 
+    @GetMapping("/medicines")
+    public ApiResponse<List<MedicineResponse>> getMedicines() {
+        return ApiResponse.success("Medicines fetched successfully", inventoryService.getMedicines());
+    }
+
     @PostMapping("/batches")
     public ResponseEntity<ApiResponse<InventoryBatchResponse>> addBatch(@Valid @RequestBody CreateInventoryBatchRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -45,6 +50,11 @@ public class InventoryController {
     @GetMapping("/centers/{centerId}/stock")
     public ApiResponse<List<CenterStockResponse>> getCenterStock(@PathVariable Long centerId) {
         return ApiResponse.success("Current stock fetched successfully", inventoryService.getCenterStock(centerId));
+    }
+
+    @GetMapping("/centers/{centerId}/batches")
+    public ApiResponse<List<InventoryBatchResponse>> getCenterBatches(@PathVariable Long centerId) {
+        return ApiResponse.success("Inventory batches fetched successfully", inventoryService.getCenterBatches(centerId));
     }
 
     @GetMapping("/centers/{centerId}/expiring")

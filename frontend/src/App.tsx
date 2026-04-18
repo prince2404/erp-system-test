@@ -17,6 +17,8 @@ import DoctorConsultationPage from './pages/doctor/DoctorConsultationPage'
 import BillingInvoicesPage from './pages/billing/BillingInvoicesPage'
 import WalletTopUpPage from './pages/billing/WalletTopUpPage'
 import CommissionLedgerPage from './pages/commissions/CommissionLedgerPage'
+import MedicinesPage from './pages/pharmacy/MedicinesPage'
+import InventoryPage from './pages/pharmacy/InventoryPage'
 
 const queryClient = new QueryClient()
 
@@ -43,6 +45,8 @@ const App = () => {
               <Route path="/billing/invoices" element={<BillingInvoicesPage />} />
               <Route path="/billing/wallet-topup" element={<WalletTopUpPage />} />
               <Route path="/commissions/ledger" element={<CommissionLedgerPage />} />
+              <Route path="/pharmacy/medicines" element={<MedicinesPage />} />
+              <Route path="/pharmacy/inventory" element={<InventoryPage />} />
             </Route>
           </Route>
 
