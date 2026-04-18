@@ -14,7 +14,7 @@ type FormValues = z.infer<typeof schema>
 
 const formatCurrency = (value: string | number) => `₹${Number(value).toFixed(2)}`
 
-const WalletTopupPage = () => {
+const WalletTopUpPage = () => {
   const [searchParams] = useSearchParams()
   const healthCardFromUrl = searchParams.get('healthCardNumber') ?? ''
   const invoiceId = searchParams.get('invoiceId')
@@ -114,4 +114,4 @@ const WalletTopupPage = () => {
   )
 }
 
-export default WalletTopupPage
+export default WalletTopUpPage

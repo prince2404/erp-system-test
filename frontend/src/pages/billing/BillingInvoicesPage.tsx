@@ -22,10 +22,15 @@ const columns: Column<Invoice>[] = [
   { key: 'total', header: 'Total', accessor: (invoice) => formatCurrency(invoice.totalAmount) },
 ]
 
-const itemLabelByType = {
-  CONSULTATION: 'Consultation fee',
-  MEDICINE: 'Medicine',
-} as const
+const getItemLabel = (itemType: string) => {
+  if (itemType === 'CONSULTATION') {
+    return 'Consultation fee'
+  }
+  if (itemType === 'MEDICINE') {
+    return 'Medicine'
+  }
+  return 'Other Item'
+}
 
 const BillingInvoicesPage = () => {
   const [statusFilter, setStatusFilter] = useState<InvoiceStatusFilter>('ALL')
@@ -144,7 +149,7 @@ const BillingInvoicesPage = () => {
               <tbody className="divide-y divide-slate-100">
                 {invoice.items.map((item) => (
                   <tr key={item.id}>
-                    <td className="px-3 py-2 text-slate-700">{itemLabelByType[item.itemType]}</td>
+                    <td className="px-3 py-2 text-slate-700">{getItemLabel(item.itemType)}</td>
                     <td className="px-3 py-2 text-slate-700">{item.quantity}</td>
                     <td className="px-3 py-2 text-slate-700">{formatCurrency(item.unitPrice)}</td>
                     <td className="px-3 py-2 text-slate-700">{formatCurrency(item.subtotal)}</td>

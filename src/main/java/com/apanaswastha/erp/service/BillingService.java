@@ -186,11 +186,10 @@ public class BillingService {
 
     public List<InvoiceResponse> listInvoices(PaymentStatus status) {
         List<Invoice> invoices = status == null
-                ? invoiceRepository.findAll()
+                ? invoiceRepository.findAllByOrderByCreatedAtDesc()
                 : invoiceRepository.findByPaymentStatusOrderByCreatedAtDesc(status);
 
         return invoices.stream()
-                .sorted((left, right) -> right.getCreatedAt().compareTo(left.getCreatedAt()))
                 .map(this::toResponse)
                 .toList();
     }

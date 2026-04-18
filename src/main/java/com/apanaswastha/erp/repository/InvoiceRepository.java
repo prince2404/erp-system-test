@@ -14,6 +14,8 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
     Optional<Invoice> findByAppointmentId(Long appointmentId);
 
+    List<Invoice> findAllByOrderByCreatedAtDesc();
+
     List<Invoice> findByPaymentStatusOrderByCreatedAtDesc(PaymentStatus paymentStatus);
 
     @Query("""
