@@ -36,6 +36,7 @@ export type CenterItem = {
 }
 
 export type UserProfile = {
+  id: number
   username: string
   role: string
 }
