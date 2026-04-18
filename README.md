@@ -376,7 +376,20 @@ VITE_PUBLIC_KEY=
 
 ---
 
-# 🧪 20. Testing Strategy
+# 🐳 20. Docker Compose Setup
+
+1. Copy `.env.example` to `.env`
+2. Run:
+   ```bash
+   docker compose up --build
+   ```
+3. Access:
+   - Frontend: `http://localhost:3000`
+   - Backend: `http://localhost:8080`
+
+---
+
+# 🧪 21. Testing Strategy
 
 ## Required:
 - Unit testing
@@ -389,7 +402,7 @@ VITE_PUBLIC_KEY=
 
 ---
 
-# 📊 21. Reporting & Analytics
+# 📊 22. Reporting & Analytics
 
 - Revenue dashboards
 - Patient analytics
@@ -398,7 +411,7 @@ VITE_PUBLIC_KEY=
 
 ---
 
-# 🚀 22. Development Phases
+# 🚀 23. Development Phases
 
 1. Auth & Users  
 2. Geography & Centers  
@@ -411,7 +424,7 @@ VITE_PUBLIC_KEY=
 
 ---
 
-# ⚠️ 23. Critical Rules
+# ⚠️ 24. Critical Rules
 
 ## Financial:
 - No deletion of transactions
