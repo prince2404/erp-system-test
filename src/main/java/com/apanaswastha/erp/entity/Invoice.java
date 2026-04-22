@@ -1,7 +1,7 @@
 package com.apanaswastha.erp.entity;
 
-import com.apanaswastha.erp.entity.enums.PaymentMethod;
-import com.apanaswastha.erp.entity.enums.PaymentStatus;
+import com.apanaswastha.erp.enums.PaymentMethod;
+import com.apanaswastha.erp.enums.PaymentStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

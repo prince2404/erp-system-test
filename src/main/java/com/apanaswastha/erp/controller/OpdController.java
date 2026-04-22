@@ -1,13 +1,13 @@
 package com.apanaswastha.erp.controller;
 
-import com.apanaswastha.erp.dto.AppointmentResponse;
-import com.apanaswastha.erp.dto.CreateAppointmentRequest;
-import com.apanaswastha.erp.dto.CreateDiagnosisRequest;
-import com.apanaswastha.erp.dto.DiagnosisResponse;
-import com.apanaswastha.erp.dto.PrescriptionResponse;
-import com.apanaswastha.erp.dto.UpdateAppointmentStatusRequest;
-import com.apanaswastha.erp.entity.enums.AppointmentStatus;
-import com.apanaswastha.erp.payload.ApiResponse;
+import com.apanaswastha.erp.dto.response.opd.AppointmentResponse;
+import com.apanaswastha.erp.dto.request.opd.CreateAppointmentRequest;
+import com.apanaswastha.erp.dto.request.opd.CreateDiagnosisRequest;
+import com.apanaswastha.erp.dto.response.opd.DiagnosisResponse;
+import com.apanaswastha.erp.dto.response.opd.PrescriptionResponse;
+import com.apanaswastha.erp.dto.request.opd.UpdateAppointmentStatusRequest;
+import com.apanaswastha.erp.enums.AppointmentStatus;
+import com.apanaswastha.erp.dto.response.common.ApiResponse;
 import com.apanaswastha.erp.service.OpdService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

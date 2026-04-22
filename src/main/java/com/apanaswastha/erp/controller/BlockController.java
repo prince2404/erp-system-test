@@ -1,8 +1,8 @@
 package com.apanaswastha.erp.controller;
 
-import com.apanaswastha.erp.dto.BlockResponse;
-import com.apanaswastha.erp.dto.CreateBlockRequest;
-import com.apanaswastha.erp.payload.ApiResponse;
+import com.apanaswastha.erp.dto.response.geography.BlockResponse;
+import com.apanaswastha.erp.dto.request.geography.CreateBlockRequest;
+import com.apanaswastha.erp.dto.response.common.ApiResponse;
 import com.apanaswastha.erp.service.BlockService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

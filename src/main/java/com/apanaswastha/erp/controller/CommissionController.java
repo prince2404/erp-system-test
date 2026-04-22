@@ -1,7 +1,7 @@
 package com.apanaswastha.erp.controller;
 
-import com.apanaswastha.erp.dto.CommissionLedgerResponse;
-import com.apanaswastha.erp.payload.ApiResponse;
+import com.apanaswastha.erp.dto.response.commission.CommissionLedgerResponse;
+import com.apanaswastha.erp.dto.response.common.ApiResponse;
 import com.apanaswastha.erp.service.CommissionService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

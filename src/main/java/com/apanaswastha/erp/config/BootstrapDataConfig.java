@@ -1,8 +1,8 @@
-package com.apanaswastha.erp.config;
+package com.apanaswastha.erp.security;
 
 import com.apanaswastha.erp.entity.Permission;
 import com.apanaswastha.erp.entity.Role;
-import com.apanaswastha.erp.entity.enums.RoleName;
+import com.apanaswastha.erp.enums.RoleName;
 import com.apanaswastha.erp.repository.PermissionRepository;
 import com.apanaswastha.erp.repository.RoleRepository;
 import org.springframework.boot.CommandLineRunner;

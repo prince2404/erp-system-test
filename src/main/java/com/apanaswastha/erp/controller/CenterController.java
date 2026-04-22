@@ -1,8 +1,8 @@
 package com.apanaswastha.erp.controller;
 
-import com.apanaswastha.erp.dto.CenterResponse;
-import com.apanaswastha.erp.dto.CreateCenterRequest;
-import com.apanaswastha.erp.payload.ApiResponse;
+import com.apanaswastha.erp.dto.response.geography.CenterResponse;
+import com.apanaswastha.erp.dto.request.geography.CreateCenterRequest;
+import com.apanaswastha.erp.dto.response.common.ApiResponse;
 import com.apanaswastha.erp.service.CenterService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

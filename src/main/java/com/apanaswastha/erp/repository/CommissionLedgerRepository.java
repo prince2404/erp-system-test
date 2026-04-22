@@ -17,7 +17,7 @@ public interface CommissionLedgerRepository extends JpaRepository<CommissionLedg
     @Query("""
             select coalesce(sum(cl.amount), 0)
             from CommissionLedger cl
-            where cl.status = com.apanaswastha.erp.entity.enums.CommissionStatus.PENDING
+            where cl.status = com.apanaswastha.erp.enums.CommissionStatus.PENDING
               and (:stateId is null or cl.invoice.appointment.center.block.district.state.id = :stateId)
               and (:districtId is null or cl.invoice.appointment.center.block.district.id = :districtId)
               and (:blockId is null or cl.invoice.appointment.center.block.id = :blockId)

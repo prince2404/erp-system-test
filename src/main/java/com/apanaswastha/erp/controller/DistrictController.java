@@ -1,8 +1,8 @@
 package com.apanaswastha.erp.controller;
 
-import com.apanaswastha.erp.dto.CreateDistrictRequest;
-import com.apanaswastha.erp.dto.DistrictResponse;
-import com.apanaswastha.erp.payload.ApiResponse;
+import com.apanaswastha.erp.dto.request.geography.CreateDistrictRequest;
+import com.apanaswastha.erp.dto.response.geography.DistrictResponse;
+import com.apanaswastha.erp.dto.response.common.ApiResponse;
 import com.apanaswastha.erp.service.DistrictService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

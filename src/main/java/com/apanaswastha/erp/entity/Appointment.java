@@ -1,6 +1,6 @@
 package com.apanaswastha.erp.entity;
 
-import com.apanaswastha.erp.entity.enums.AppointmentStatus;
+import com.apanaswastha.erp.enums.AppointmentStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

@@ -1,7 +1,7 @@
 package com.apanaswastha.erp.repository;
 
 import com.apanaswastha.erp.entity.Appointment;
-import com.apanaswastha.erp.entity.enums.AppointmentStatus;
+import com.apanaswastha.erp.enums.AppointmentStatus;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;

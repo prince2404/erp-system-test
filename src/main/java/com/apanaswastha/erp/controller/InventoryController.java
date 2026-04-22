@@ -1,11 +1,11 @@
 package com.apanaswastha.erp.controller;
 
-import com.apanaswastha.erp.dto.CenterStockResponse;
-import com.apanaswastha.erp.dto.CreateInventoryBatchRequest;
-import com.apanaswastha.erp.dto.CreateMedicineRequest;
-import com.apanaswastha.erp.dto.InventoryBatchResponse;
-import com.apanaswastha.erp.dto.MedicineResponse;
-import com.apanaswastha.erp.payload.ApiResponse;
+import com.apanaswastha.erp.dto.response.inventory.CenterStockResponse;
+import com.apanaswastha.erp.dto.request.inventory.CreateInventoryBatchRequest;
+import com.apanaswastha.erp.dto.request.inventory.CreateMedicineRequest;
+import com.apanaswastha.erp.dto.response.inventory.InventoryBatchResponse;
+import com.apanaswastha.erp.dto.response.inventory.MedicineResponse;
+import com.apanaswastha.erp.dto.response.common.ApiResponse;
 import com.apanaswastha.erp.service.InventoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

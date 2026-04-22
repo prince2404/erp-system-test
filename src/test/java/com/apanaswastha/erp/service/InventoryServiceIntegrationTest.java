@@ -1,16 +1,16 @@
 package com.apanaswastha.erp.service;
 
-import com.apanaswastha.erp.dto.BlockResponse;
-import com.apanaswastha.erp.dto.CenterResponse;
-import com.apanaswastha.erp.dto.CreateBlockRequest;
-import com.apanaswastha.erp.dto.CreateCenterRequest;
-import com.apanaswastha.erp.dto.CreateDistrictRequest;
-import com.apanaswastha.erp.dto.CreateInventoryBatchRequest;
-import com.apanaswastha.erp.dto.CreateMedicineRequest;
-import com.apanaswastha.erp.dto.CreateStateRequest;
-import com.apanaswastha.erp.dto.DistrictResponse;
-import com.apanaswastha.erp.dto.InventoryBatchResponse;
-import com.apanaswastha.erp.dto.MedicineResponse;
+import com.apanaswastha.erp.dto.response.geography.BlockResponse;
+import com.apanaswastha.erp.dto.response.geography.CenterResponse;
+import com.apanaswastha.erp.dto.request.geography.CreateBlockRequest;
+import com.apanaswastha.erp.dto.request.geography.CreateCenterRequest;
+import com.apanaswastha.erp.dto.request.geography.CreateDistrictRequest;
+import com.apanaswastha.erp.dto.request.inventory.CreateInventoryBatchRequest;
+import com.apanaswastha.erp.dto.request.inventory.CreateMedicineRequest;
+import com.apanaswastha.erp.dto.request.geography.CreateStateRequest;
+import com.apanaswastha.erp.dto.response.geography.DistrictResponse;
+import com.apanaswastha.erp.dto.response.inventory.InventoryBatchResponse;
+import com.apanaswastha.erp.dto.response.inventory.MedicineResponse;
 import com.apanaswastha.erp.entity.InventoryBatch;
 import com.apanaswastha.erp.entity.Vendor;
 import com.apanaswastha.erp.exception.InsufficientStockException;

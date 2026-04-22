@@ -1,4 +1,4 @@
-package com.apanaswastha.erp.config;
+package com.apanaswastha.erp.security;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;

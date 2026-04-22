@@ -1,9 +1,9 @@
 package com.apanaswastha.erp.controller;
 
-import com.apanaswastha.erp.dto.InvoiceResponse;
-import com.apanaswastha.erp.dto.PayInvoiceRequest;
-import com.apanaswastha.erp.entity.enums.PaymentStatus;
-import com.apanaswastha.erp.payload.ApiResponse;
+import com.apanaswastha.erp.dto.response.billing.InvoiceResponse;
+import com.apanaswastha.erp.dto.request.billing.PayInvoiceRequest;
+import com.apanaswastha.erp.enums.PaymentStatus;
+import com.apanaswastha.erp.dto.response.common.ApiResponse;
 import com.apanaswastha.erp.service.BillingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

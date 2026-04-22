@@ -1,0 +1,7 @@
+package com.apanaswastha.erp.config;
+
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class DatabaseConfig {
+}

@@ -1,13 +1,13 @@
 package com.apanaswastha.erp.service;
 
-import com.apanaswastha.erp.dto.BlockResponse;
-import com.apanaswastha.erp.dto.CenterResponse;
-import com.apanaswastha.erp.dto.CreateBlockRequest;
-import com.apanaswastha.erp.dto.CreateCenterRequest;
-import com.apanaswastha.erp.dto.CreateDistrictRequest;
-import com.apanaswastha.erp.dto.CreateStateRequest;
-import com.apanaswastha.erp.dto.DistrictResponse;
-import com.apanaswastha.erp.dto.StateResponse;
+import com.apanaswastha.erp.dto.response.geography.BlockResponse;
+import com.apanaswastha.erp.dto.response.geography.CenterResponse;
+import com.apanaswastha.erp.dto.request.geography.CreateBlockRequest;
+import com.apanaswastha.erp.dto.request.geography.CreateCenterRequest;
+import com.apanaswastha.erp.dto.request.geography.CreateDistrictRequest;
+import com.apanaswastha.erp.dto.request.geography.CreateStateRequest;
+import com.apanaswastha.erp.dto.response.geography.DistrictResponse;
+import com.apanaswastha.erp.dto.response.geography.StateResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,6 +1,6 @@
 package com.apanaswastha.erp.service;
 
-import com.apanaswastha.erp.dto.DashboardMetricsDTO;
+import com.apanaswastha.erp.dto.response.dashboard.DashboardMetricsDTO;
 import com.apanaswastha.erp.entity.Appointment;
 import com.apanaswastha.erp.entity.Block;
 import com.apanaswastha.erp.entity.Center;
@@ -12,11 +12,11 @@ import com.apanaswastha.erp.entity.Invoice;
 import com.apanaswastha.erp.entity.Role;
 import com.apanaswastha.erp.entity.State;
 import com.apanaswastha.erp.entity.User;
-import com.apanaswastha.erp.entity.enums.AppointmentStatus;
-import com.apanaswastha.erp.entity.enums.CommissionStatus;
-import com.apanaswastha.erp.entity.enums.PaymentMethod;
-import com.apanaswastha.erp.entity.enums.PaymentStatus;
-import com.apanaswastha.erp.entity.enums.RoleName;
+import com.apanaswastha.erp.enums.AppointmentStatus;
+import com.apanaswastha.erp.enums.CommissionStatus;
+import com.apanaswastha.erp.enums.PaymentMethod;
+import com.apanaswastha.erp.enums.PaymentStatus;
+import com.apanaswastha.erp.enums.RoleName;
 import com.apanaswastha.erp.repository.AppointmentRepository;
 import com.apanaswastha.erp.repository.BlockRepository;
 import com.apanaswastha.erp.repository.CenterRepository;

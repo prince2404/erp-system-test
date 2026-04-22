@@ -1,8 +1,8 @@
 package com.apanaswastha.erp.controller;
 
-import com.apanaswastha.erp.dto.WalletTransactionRequest;
-import com.apanaswastha.erp.dto.WalletTransactionResponse;
-import com.apanaswastha.erp.payload.ApiResponse;
+import com.apanaswastha.erp.dto.request.wallet.WalletTransactionRequest;
+import com.apanaswastha.erp.dto.response.wallet.WalletTransactionResponse;
+import com.apanaswastha.erp.dto.response.common.ApiResponse;
 import com.apanaswastha.erp.service.WalletService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
