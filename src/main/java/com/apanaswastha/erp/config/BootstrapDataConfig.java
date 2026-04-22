@@ -1,4 +1,4 @@
-package com.apanaswastha.erp.security;
+package com.apanaswastha.erp.config;
 
 import com.apanaswastha.erp.entity.Permission;
 import com.apanaswastha.erp.entity.Role;
