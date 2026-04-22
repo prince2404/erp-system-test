@@ -1,10 +1,10 @@
 package com.apanaswastha.erp.controller;
 
-import com.apanaswastha.erp.dto.CreateFamilyMemberRequest;
-import com.apanaswastha.erp.dto.CreateFamilyRequest;
-import com.apanaswastha.erp.dto.FamilyMemberResponse;
-import com.apanaswastha.erp.dto.FamilyResponse;
-import com.apanaswastha.erp.payload.ApiResponse;
+import com.apanaswastha.erp.dto.request.family.CreateFamilyMemberRequest;
+import com.apanaswastha.erp.dto.request.family.CreateFamilyRequest;
+import com.apanaswastha.erp.dto.response.family.FamilyMemberResponse;
+import com.apanaswastha.erp.dto.response.family.FamilyResponse;
+import com.apanaswastha.erp.dto.response.common.ApiResponse;
 import com.apanaswastha.erp.service.FamilyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

@@ -1,57 +1,32 @@
 package com.apanaswastha.erp.service;
 
-import com.apanaswastha.erp.dto.CreateDistrictRequest;
-import com.apanaswastha.erp.dto.DistrictResponse;
-import com.apanaswastha.erp.entity.District;
-import com.apanaswastha.erp.entity.State;
-import com.apanaswastha.erp.exception.NotFoundException;
-import com.apanaswastha.erp.repository.DistrictRepository;
-import com.apanaswastha.erp.repository.StateRepository;
-import org.springframework.stereotype.Service;
+import com.apanaswastha.erp.dto.request.geography.CreateDistrictRequest;
+import com.apanaswastha.erp.dto.response.geography.DistrictResponse;
 
 import java.util.List;
 
-@Service
-public class DistrictService {
+public interface DistrictService {
 
-    private final DistrictRepository districtRepository;
-    private final StateRepository stateRepository;
+    /**
+     * Creates a district.
+     *
+     * @param request create payload
+     * @return created district
+     */
+    DistrictResponse create(CreateDistrictRequest request);
 
-    public DistrictService(DistrictRepository districtRepository, StateRepository stateRepository) {
-        this.districtRepository = districtRepository;
-        this.stateRepository = stateRepository;
-    }
+    /**
+     * Lists all districts.
+     *
+     * @return district list
+     */
+    List<DistrictResponse> getAll();
 
-    public DistrictResponse create(CreateDistrictRequest request) {
-        State state = stateRepository.findById(request.getStateId())
-                .orElseThrow(() -> new NotFoundException("State not found with id: " + request.getStateId()));
-
-        District district = new District();
-        district.setName(request.getName());
-        district.setState(state);
-
-        return toResponse(districtRepository.save(district));
-    }
-
-    public List<DistrictResponse> getAll() {
-        return districtRepository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
-    }
-
-    public DistrictResponse getById(Long id) {
-        District district = districtRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("District not found with id: " + id));
-        return toResponse(district);
-    }
-
-    private DistrictResponse toResponse(District district) {
-        return new DistrictResponse(
-                district.getId(),
-                district.getName(),
-                district.getState().getId(),
-                district.getCreatedAt(),
-                district.getUpdatedAt()
-        );
-    }
+    /**
+     * Gets district by id.
+     *
+     * @param id district id
+     * @return district details
+     */
+    DistrictResponse getById(Long id);
 }

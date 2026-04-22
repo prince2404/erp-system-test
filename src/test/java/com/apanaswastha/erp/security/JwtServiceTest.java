@@ -16,11 +16,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class JwtServiceTest {
+class JwtTokenProviderTest {
 
     private static final String SECRET = "ZmFrZS1kZW1vLXNlY3JldC1rZXktdGhhdC1tdXN0LWJlLTMyLWJ5dGVzLWxvbmc=";
 
-    private JwtService jwtService;
+    private JwtTokenProvider jwtService;
     private UserDetails userDetails;
 
     @BeforeEach
@@ -29,7 +29,7 @@ class JwtServiceTest {
         jwtProperties.setSecret(SECRET);
         jwtProperties.setExpirationMs(60_000);
 
-        jwtService = new JwtService(jwtProperties);
+        jwtService = new JwtTokenProvider(jwtProperties);
         userDetails = User.builder()
                 .username("test-user")
                 .password("password")

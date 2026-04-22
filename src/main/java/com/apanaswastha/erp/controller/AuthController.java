@@ -1,9 +1,9 @@
 package com.apanaswastha.erp.controller;
 
-import com.apanaswastha.erp.dto.AuthResponse;
-import com.apanaswastha.erp.dto.LoginRequest;
-import com.apanaswastha.erp.dto.RegisterRequest;
-import com.apanaswastha.erp.payload.ApiResponse;
+import com.apanaswastha.erp.dto.response.auth.AuthResponse;
+import com.apanaswastha.erp.dto.request.auth.LoginRequest;
+import com.apanaswastha.erp.dto.request.auth.RegisterRequest;
+import com.apanaswastha.erp.dto.response.common.ApiResponse;
 import com.apanaswastha.erp.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

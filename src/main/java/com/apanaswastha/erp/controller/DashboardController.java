@@ -1,7 +1,7 @@
 package com.apanaswastha.erp.controller;
 
-import com.apanaswastha.erp.dto.DashboardMetricsDTO;
-import com.apanaswastha.erp.payload.ApiResponse;
+import com.apanaswastha.erp.dto.response.dashboard.DashboardMetricsDTO;
+import com.apanaswastha.erp.dto.response.common.ApiResponse;
 import com.apanaswastha.erp.service.DashboardService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;

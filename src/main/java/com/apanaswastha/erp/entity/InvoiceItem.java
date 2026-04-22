@@ -1,6 +1,6 @@
 package com.apanaswastha.erp.entity;
 
-import com.apanaswastha.erp.entity.enums.InvoiceItemType;
+import com.apanaswastha.erp.enums.InvoiceItemType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

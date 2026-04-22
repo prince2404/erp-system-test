@@ -1,7 +1,7 @@
 package com.apanaswastha.erp.repository;
 
 import com.apanaswastha.erp.entity.Role;
-import com.apanaswastha.erp.entity.enums.RoleName;
+import com.apanaswastha.erp.enums.RoleName;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

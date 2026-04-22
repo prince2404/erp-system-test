@@ -1,6 +1,6 @@
 package com.apanaswastha.erp.entity;
 
-import com.apanaswastha.erp.entity.enums.CenterType;
+import com.apanaswastha.erp.enums.CenterType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

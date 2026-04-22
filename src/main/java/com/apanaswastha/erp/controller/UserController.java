@@ -1,6 +1,6 @@
 package com.apanaswastha.erp.controller;
 
-import com.apanaswastha.erp.payload.ApiResponse;
+import com.apanaswastha.erp.dto.response.common.ApiResponse;
 import com.apanaswastha.erp.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

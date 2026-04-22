@@ -1,8 +1,8 @@
 package com.apanaswastha.erp.controller;
 
-import com.apanaswastha.erp.dto.CreateStateRequest;
-import com.apanaswastha.erp.dto.StateResponse;
-import com.apanaswastha.erp.payload.ApiResponse;
+import com.apanaswastha.erp.dto.request.geography.CreateStateRequest;
+import com.apanaswastha.erp.dto.response.geography.StateResponse;
+import com.apanaswastha.erp.dto.response.common.ApiResponse;
 import com.apanaswastha.erp.service.StateService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

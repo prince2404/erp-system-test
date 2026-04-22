@@ -1,14 +1,19 @@
 package com.apanaswastha.erp.service;
 
-import com.apanaswastha.erp.dto.AuthResponse;
-import com.apanaswastha.erp.dto.LoginRequest;
-import com.apanaswastha.erp.dto.RegisterRequest;
+import com.apanaswastha.erp.dto.response.auth.AuthResponse;
+import com.apanaswastha.erp.dto.request.auth.LoginRequest;
+import com.apanaswastha.erp.dto.request.auth.RegisterRequest;
 import com.apanaswastha.erp.entity.Role;
 import com.apanaswastha.erp.entity.User;
-import com.apanaswastha.erp.entity.enums.RoleName;
+import com.apanaswastha.erp.enums.RoleName;
+import com.apanaswastha.erp.repository.BlockRepository;
+import com.apanaswastha.erp.repository.CenterRepository;
+import com.apanaswastha.erp.repository.DistrictRepository;
 import com.apanaswastha.erp.repository.RoleRepository;
+import com.apanaswastha.erp.repository.StateRepository;
 import com.apanaswastha.erp.repository.UserRepository;
-import com.apanaswastha.erp.security.JwtService;
+import com.apanaswastha.erp.security.JwtTokenProvider;
+import com.apanaswastha.erp.service.impl.AuthServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -40,12 +45,20 @@ class AuthServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
+    private StateRepository stateRepository;
+    @Mock
+    private DistrictRepository districtRepository;
+    @Mock
+    private BlockRepository blockRepository;
+    @Mock
+    private CenterRepository centerRepository;
+    @Mock
     private AuthenticationManager authenticationManager;
     @Mock
-    private JwtService jwtService;
+    private JwtTokenProvider jwtService;
 
     @InjectMocks
-    private AuthService authService;
+    private AuthServiceImpl authService;
 
     @Test
     void registerShouldEncodePasswordAssignDefaultRoleAndReturnToken() {
