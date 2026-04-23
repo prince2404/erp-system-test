@@ -34,6 +34,15 @@ A full-stack Healthcare ERP platform for managing healthcare operations end-to-e
 - GitHub Actions
 - Swagger / OpenAPI
 
+## Environment Strategy
+
+- `.env` is for local development and is ignored by Git.
+- `.env.example` is a committed template with local/demo values.
+- `backend/src/main/resources/application.yml` expects real environment variables.
+- `backend/src/main/resources/application-local.yml` imports `.env` only when the `local` profile is active.
+- `mvn spring-boot:run` activates the `local` profile automatically through the Spring Boot Maven plugin.
+- Production and staging deployments should provide environment variables through Docker, CI/CD, or the hosting platform.
+
 ## Getting Started (Docker Compose)
 
 ### 1) Configure environment
@@ -48,14 +57,48 @@ Update secrets in `.env` before running in shared or production-like environment
 ### 2) Start the full stack
 
 ```bash
-docker-compose up -d
+docker compose up -d --build
 ```
+
+Docker Compose uses the `db` service name internally for the backend database URL, so the same `.env` can keep `DB_URL=jdbc:postgresql://localhost:5432/erp_system` for local Maven runs.
 
 ### 3) Access services
 
 - **Frontend:** http://localhost:3000
 - **Backend API base:** http://localhost:8080
 - **Swagger UI:** http://localhost:8080/swagger-ui.html
+
+## Local Backend With Maven
+
+Start PostgreSQL first:
+
+```bash
+docker compose up -d db
+```
+
+Then run the backend from Maven:
+
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+The Maven run goal activates the `local` Spring profile, and that profile imports the root `.env` file automatically.
+
+## Deployment Notes
+
+For staging or production, do not depend on local `.env` loading. Provide these variables from the deployment environment:
+
+```text
+DB_URL
+DB_USER
+DB_PASS
+JWT_SECRET
+JWT_EXPIRATION_MS
+JWT_REFRESH_EXPIRATION_MS
+```
+
+For containerized deployments, set `DB_URL` to the database hostname visible from the backend container, not necessarily `localhost`.
 
 ### Authentication / First User
 
