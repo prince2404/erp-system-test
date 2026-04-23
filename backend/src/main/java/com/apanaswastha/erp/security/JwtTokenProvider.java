@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Service
@@ -40,15 +41,28 @@ public class JwtTokenProvider {
     }
 
     public String generateToken(UserDetails userDetails) {
+        return generateToken(userDetails, UUID.randomUUID().toString());
+    }
+
+    public String generateToken(UserDetails userDetails, String jti) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + jwtProperties.getExpirationMs());
 
         return Jwts.builder()
                 .subject(userDetails.getUsername())
+                .id(jti)
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(getSignInKey())
                 .compact();
+    }
+
+    public String extractJti(String token) {
+        return extractClaim(token, Claims::getId);
+    }
+
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {

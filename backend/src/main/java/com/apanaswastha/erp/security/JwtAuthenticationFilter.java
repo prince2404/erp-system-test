@@ -22,10 +22,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtService;
     private final CustomUserDetailsService userDetailsService;
+    private final com.apanaswastha.erp.service.AuthSessionService authSessionService;
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtService, CustomUserDetailsService userDetailsService) {
+    public JwtAuthenticationFilter(JwtTokenProvider jwtService,
+                                   CustomUserDetailsService userDetailsService,
+                                   com.apanaswastha.erp.service.AuthSessionService authSessionService) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
+        this.authSessionService = authSessionService;
     }
 
     @Override
@@ -40,10 +44,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String jwt = authHeader.substring(7);
         String username;
+        String jti;
         try {
             username = jwtService.extractUsername(jwt);
+            jti = jwtService.extractJti(jwt);
         } catch (JwtException | IllegalArgumentException ex) {
             log.debug("Ignoring invalid JWT for request {}", request.getRequestURI());
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (jti == null || !authSessionService.isSessionActive(jti)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -58,6 +69,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 );
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+                authSessionService.touchSession(jti);
             }
         }
 
