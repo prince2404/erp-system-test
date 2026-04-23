@@ -27,6 +27,7 @@ jobs:
           cache: maven
 
       - name: Build and test backend
+        working-directory: backend
         run: mvn -B clean package
 
   build-frontend:

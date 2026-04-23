@@ -87,9 +87,8 @@ flowchart LR
 
 ```text
 .
-├── backend/               # Backend Dockerfile
+├── backend/               # Spring Boot backend (Dockerfile, pom.xml, src/)
 ├── frontend/              # React application + frontend Dockerfile
-├── src/                   # Spring Boot source code
 ├── docker-compose.yml     # Full-stack orchestration
 ├── .env.example           # Environment template
 └── .github/workflows/ci.yml
@@ -98,6 +97,6 @@ flowchart LR
 ## CI
 
 GitHub Actions workflow (`.github/workflows/ci.yml`) validates:
-- Backend build/tests (`mvn -B clean package`)
+- Backend build/tests (`cd backend && mvn -B clean package`)
 - Frontend build (`npm ci && npm run build`)
 - Docker Compose build verification
