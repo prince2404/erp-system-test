@@ -1,11 +1,15 @@
 import { Navigate, Outlet } from 'react-router-dom'
-import { TOKEN_STORAGE_KEY } from '../../lib/api'
+import { ROUTE_PATHS } from '../../constants/routePaths'
+import { useAuth } from '../../hooks/useAuth'
 
+/**
+ * Guards private routes and redirects unauthenticated users to login.
+ */
 const ProtectedRoute = () => {
-  const token = localStorage.getItem(TOKEN_STORAGE_KEY)
+  const { token } = useAuth()
 
   if (!token) {
-    return <Navigate to="/login" replace />
+    return <Navigate to={ROUTE_PATHS.login} replace />
   }
 
   return <Outlet />

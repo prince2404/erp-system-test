@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import api from '../lib/api'
-import type { ApiEnvelope } from './useAdminData'
+import { billingApi } from '../api/billingApi'
 
 export type InvoiceItem = {
   id: number
@@ -43,61 +42,75 @@ export type CommissionRecord = {
   createdAt: string
 }
 
-const getInvoices = async (status: InvoiceStatusFilter) => {
-  const response = await api.get<ApiEnvelope<Invoice[]>>('/api/billing/invoices', {
-    params: status === 'ALL' ? undefined : { status },
-  })
-  return response.data.data
+/**
+ * Unwraps normalized API results and raises meaningful query errors.
+ */
+const unwrapApiResult = <T>(result: { data: T | null; error: string | null }): T => {
+  if (result.error || result.data === null) {
+    throw new Error(result.error ?? 'Unexpected API error')
+  }
+
+  return result.data
 }
 
-const getInvoice = async (invoiceId: number) => {
-  const response = await api.get<ApiEnvelope<Invoice>>(`/api/billing/invoices/${invoiceId}`)
-  return response.data.data
-}
-
-const getWallet = async (healthCardNumber: string) => {
-  const response = await api.get<ApiEnvelope<WalletDetails>>(`/api/v1/families/${healthCardNumber}`)
-  return response.data.data
-}
-
-const getCommissions = async (userId: number) => {
-  const response = await api.get<ApiEnvelope<CommissionRecord[]>>(`/api/commissions/user/${userId}`)
-  return response.data.data
-}
-
+/**
+ * Billing invoices query with optional status filtering.
+ */
 export const useInvoices = (status: InvoiceStatusFilter = 'ALL') =>
   useQuery({
     queryKey: ['billing', 'invoices', status],
-    queryFn: () => getInvoices(status),
+    queryFn: async () =>
+      unwrapApiResult<Invoice[]>(
+        (await billingApi.getInvoices(status)) as { data: Invoice[] | null; error: string | null },
+      ),
   })
 
+/**
+ * Single invoice query.
+ */
 export const useInvoice = (invoiceId?: number) =>
   useQuery({
     queryKey: ['billing', 'invoice', invoiceId],
-    queryFn: () => getInvoice(invoiceId ?? 0),
+    queryFn: async () =>
+      unwrapApiResult<Invoice>((await billingApi.getInvoice(invoiceId ?? 0)) as { data: Invoice | null; error: string | null }),
     enabled: typeof invoiceId === 'number' && Number.isFinite(invoiceId),
   })
 
+/**
+ * Wallet details query by health card number.
+ */
 export const useWallet = (healthCardNumber?: string) =>
   useQuery({
     queryKey: ['billing', 'wallet', healthCardNumber],
-    queryFn: () => getWallet(healthCardNumber ?? ''),
+    queryFn: async () =>
+      unwrapApiResult<WalletDetails>(
+        (await billingApi.getWallet(healthCardNumber ?? '')) as { data: WalletDetails | null; error: string | null },
+      ),
     enabled: Boolean(healthCardNumber),
   })
 
+/**
+ * Commission records query by user id.
+ */
 export const useCommissions = (userId?: number) =>
   useQuery({
     queryKey: ['billing', 'commissions', userId],
-    queryFn: () => getCommissions(userId ?? 0),
+    queryFn: async () =>
+      unwrapApiResult<CommissionRecord[]>(
+        (await billingApi.getCommissions(userId ?? 0)) as { data: CommissionRecord[] | null; error: string | null },
+      ),
     enabled: typeof userId === 'number' && Number.isFinite(userId),
   })
 
+/**
+ * Invoice payment mutation.
+ */
 export const usePayInvoice = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (payload: { invoiceId: number; paymentMethod: 'WALLET' | 'CASH' | 'UPI' }) =>
-      api.post(`/api/billing/invoices/${payload.invoiceId}/pay`, { paymentMethod: payload.paymentMethod }),
+    mutationFn: async (payload: { invoiceId: number; paymentMethod: 'WALLET' | 'CASH' | 'UPI' }) =>
+      unwrapApiResult(await billingApi.payInvoice(payload)),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['billing', 'invoices'] })
       queryClient.invalidateQueries({ queryKey: ['billing', 'invoice', variables.invoiceId] })
@@ -106,17 +119,15 @@ export const usePayInvoice = () => {
   })
 }
 
+/**
+ * Wallet top-up mutation.
+ */
 export const useTopUpWallet = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (payload: { healthCardNumber: string; amount: number; referenceId?: string; description?: string }) =>
-      api.post('/api/v1/wallet/credit', {
-        healthCardNumber: payload.healthCardNumber,
-        amount: payload.amount,
-        referenceId: payload.referenceId ?? `wallet-topup-${Date.now()}`,
-        description: payload.description ?? 'Wallet top-up from billing UI',
-      }),
+    mutationFn: async (payload: { healthCardNumber: string; amount: number; referenceId?: string; description?: string }) =>
+      unwrapApiResult(await billingApi.topUpWallet(payload)),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['families'] })
       queryClient.invalidateQueries({ queryKey: ['billing', 'wallet', variables.healthCardNumber] })

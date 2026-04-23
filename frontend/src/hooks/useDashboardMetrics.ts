@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import api from '../lib/api'
+import { dashboardApi } from '../api/dashboardApi'
 
 export type DashboardMetrics = {
   totalRevenue: number
@@ -8,20 +8,19 @@ export type DashboardMetrics = {
   dailyOpdVisits: number
 }
 
-type ApiEnvelope<T> = {
-  success: boolean
-  message: string
-  data: T
-}
-
-const getDashboardMetrics = async (): Promise<DashboardMetrics> => {
-  const response = await api.get<ApiEnvelope<DashboardMetrics>>('/api/dashboard/metrics')
-  return response.data.data
-}
-
+/**
+ * Dashboard metrics query used by home dashboard page.
+ */
 export const useDashboardMetrics = () => {
   return useQuery({
     queryKey: ['dashboard-metrics'],
-    queryFn: getDashboardMetrics,
+    queryFn: async (): Promise<DashboardMetrics> => {
+      const result = await dashboardApi.getMetrics()
+      if (result.error || !result.data) {
+        throw new Error(result.error ?? 'Unable to load dashboard metrics')
+      }
+
+      return result.data
+    },
   })
 }

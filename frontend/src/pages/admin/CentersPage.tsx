@@ -8,10 +8,9 @@ import {
   useBlocks,
   useCenters,
   useCreateCenter,
-  useCurrentUser,
   type CenterItem,
 } from '../../hooks/useAdminData'
-import { canCreateCenter } from '../../lib/rbac'
+import { usePermission } from '../../hooks/usePermission'
 
 const schema = z.object({
   name: z.string().trim().min(2, 'Center name is required'),
@@ -26,7 +25,7 @@ type FormValues = z.infer<typeof schema>
 
 const CentersPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const { data: currentUser } = useCurrentUser()
+  const { hasPermission } = usePermission()
   const { data: centers = [], isLoading } = useCenters()
   const { data: blocks = [] } = useBlocks()
   const createCenter = useCreateCenter()
@@ -69,7 +68,7 @@ const CentersPage = () => {
     setIsModalOpen(false)
   }
 
-  const canCreate = canCreateCenter(currentUser?.role)
+  const canCreate = hasPermission('user:create')
 
   return (
     <div className="space-y-4">

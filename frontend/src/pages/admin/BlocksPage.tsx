@@ -7,11 +7,10 @@ import Modal from '../../components/common/Modal'
 import {
   useBlocks,
   useCreateBlock,
-  useCurrentUser,
   useDistricts,
   type BlockItem,
 } from '../../hooks/useAdminData'
-import { canCreateBlock } from '../../lib/rbac'
+import { usePermission } from '../../hooks/usePermission'
 
 const schema = z.object({
   name: z.string().trim().min(2, 'Block name is required'),
@@ -22,7 +21,7 @@ type FormValues = z.infer<typeof schema>
 
 const BlocksPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const { data: currentUser } = useCurrentUser()
+  const { hasPermission } = usePermission()
   const { data: blocks = [], isLoading } = useBlocks()
   const { data: districts = [] } = useDistricts()
   const createBlock = useCreateBlock()
@@ -55,7 +54,7 @@ const BlocksPage = () => {
     setIsModalOpen(false)
   }
 
-  const canCreate = canCreateBlock(currentUser?.role)
+  const canCreate = hasPermission('user:create')
 
   return (
     <div className="space-y-4">

@@ -6,12 +6,11 @@ import DataTable, { type Column } from '../../components/common/DataTable'
 import Modal from '../../components/common/Modal'
 import {
   useCreateDistrict,
-  useCurrentUser,
   useDistricts,
   useStates,
   type DistrictItem,
 } from '../../hooks/useAdminData'
-import { canCreateDistrict } from '../../lib/rbac'
+import { usePermission } from '../../hooks/usePermission'
 
 const schema = z.object({
   name: z.string().trim().min(2, 'District name is required'),
@@ -22,7 +21,7 @@ type FormValues = z.infer<typeof schema>
 
 const DistrictsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const { data: currentUser } = useCurrentUser()
+  const { hasPermission } = usePermission()
   const { data: districts = [], isLoading } = useDistricts()
   const { data: states = [] } = useStates()
   const createDistrict = useCreateDistrict()
@@ -55,7 +54,7 @@ const DistrictsPage = () => {
     setIsModalOpen(false)
   }
 
-  const canCreate = canCreateDistrict(currentUser?.role)
+  const canCreate = hasPermission('user:create')
 
   return (
     <div className="space-y-4">

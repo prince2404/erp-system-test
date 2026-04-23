@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import api from '../lib/api'
+import { adminApi } from '../api/adminApi'
+import { authApi } from '../api/authApi'
+import { userApi } from '../api/userApi'
 
+/**
+ * Shared API envelope type for compatibility with existing type imports.
+ */
 export type ApiEnvelope<T> = {
   success: boolean
   message: string
@@ -66,128 +71,146 @@ type RegisterPayload = {
   assignedCenterId?: number
 }
 
-const getStates = async () => {
-  const response = await api.get<ApiEnvelope<StateItem[]>>('/api/v1/states')
-  return response.data.data
+/**
+ * Unwraps normalized API results and throws for react-query error handling.
+ */
+const unwrapApiResult = <T>(result: { data: T | null; error: string | null }): T => {
+  if (result.error || result.data === null) {
+    throw new Error(result.error ?? 'Unexpected API error')
+  }
+
+  return result.data
 }
 
-const getDistricts = async () => {
-  const response = await api.get<ApiEnvelope<DistrictItem[]>>('/api/v1/districts')
-  return response.data.data
-}
-
-const getBlocks = async () => {
-  const response = await api.get<ApiEnvelope<BlockItem[]>>('/api/v1/blocks')
-  return response.data.data
-}
-
-const getCenters = async () => {
-  const response = await api.get<ApiEnvelope<CenterItem[]>>('/api/v1/centers')
-  return response.data.data
-}
-
-const getUsers = async () => {
-  const response = await api.get<ApiEnvelope<UserPage>>('/api/v1/users?page=0&size=200')
-  return response.data.data.content
-}
-
-const getCurrentUser = async () => {
-  const response = await api.get<ApiEnvelope<UserProfile>>('/api/v1/users/me')
-  return response.data.data
-}
-
+/**
+ * Provides current user query data.
+ */
 export const useCurrentUser = () =>
   useQuery({
     queryKey: ['current-user'],
-    queryFn: getCurrentUser,
+    queryFn: async () => unwrapApiResult<UserProfile>(await userApi.getCurrentUser()),
   })
 
+/**
+ * Provides states query data.
+ */
 export const useStates = () =>
   useQuery({
     queryKey: ['states'],
-    queryFn: getStates,
+    queryFn: async () => unwrapApiResult<StateItem[]>(await adminApi.getStates()),
   })
 
+/**
+ * Provides districts query data.
+ */
 export const useDistricts = () =>
   useQuery({
     queryKey: ['districts'],
-    queryFn: getDistricts,
+    queryFn: async () => unwrapApiResult<DistrictItem[]>(await adminApi.getDistricts()),
   })
 
+/**
+ * Provides blocks query data.
+ */
 export const useBlocks = () =>
   useQuery({
     queryKey: ['blocks'],
-    queryFn: getBlocks,
+    queryFn: async () => unwrapApiResult<BlockItem[]>(await adminApi.getBlocks()),
   })
 
+/**
+ * Provides centers query data.
+ */
 export const useCenters = () =>
   useQuery({
     queryKey: ['centers'],
-    queryFn: getCenters,
+    queryFn: async () => unwrapApiResult<CenterItem[]>(await adminApi.getCenters()),
   })
 
+/**
+ * Provides users query data.
+ */
 export const useUsers = () =>
   useQuery({
     queryKey: ['users'],
-    queryFn: getUsers,
+    queryFn: async () => {
+      const result = await userApi.getUsers()
+      const page = unwrapApiResult<UserPage>(result)
+      return page.content
+    },
   })
 
+/**
+ * Mutation hook for state creation.
+ */
 export const useCreateState = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (payload: { name: string; code: string }) => api.post('/api/v1/states', payload),
+    mutationFn: async (payload: { name: string; code: string }) => unwrapApiResult(await adminApi.createState(payload)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['states'] })
     },
   })
 }
 
+/**
+ * Mutation hook for district creation.
+ */
 export const useCreateDistrict = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (payload: { name: string; stateId: number }) => api.post('/api/v1/districts', payload),
+    mutationFn: async (payload: { name: string; stateId: number }) => unwrapApiResult(await adminApi.createDistrict(payload)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['districts'] })
     },
   })
 }
 
+/**
+ * Mutation hook for block creation.
+ */
 export const useCreateBlock = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (payload: { name: string; districtId: number }) => api.post('/api/v1/blocks', payload),
+    mutationFn: async (payload: { name: string; districtId: number }) => unwrapApiResult(await adminApi.createBlock(payload)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['blocks'] })
     },
   })
 }
 
+/**
+ * Mutation hook for center creation.
+ */
 export const useCreateCenter = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (payload: {
+    mutationFn: async (payload: {
       name: string
       centerCode: string
       type: 'CLINIC' | 'HOSPITAL'
       blockId: number
       address: string
       contactNumber: string
-    }) => api.post('/api/v1/centers', payload),
+    }) => unwrapApiResult(await adminApi.createCenter(payload)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['centers'] })
     },
   })
 }
 
+/**
+ * Mutation hook for user registration.
+ */
 export const useCreateUser = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (payload: RegisterPayload) => api.post('/api/v1/auth/register', payload),
+    mutationFn: async (payload: RegisterPayload) => unwrapApiResult(await authApi.register(payload)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
     },
