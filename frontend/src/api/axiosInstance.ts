@@ -10,6 +10,10 @@ export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 })
 
+const refreshClient = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+})
+
 const clearStoredTokens = () => {
   localStorage.removeItem(TOKEN_STORAGE_KEY)
   localStorage.removeItem(REFRESH_TOKEN_STORAGE_KEY)
@@ -40,8 +44,8 @@ apiClient.interceptors.response.use(
       }
 
       try {
-        const refreshResponse = await axios.post<ApiEnvelope<{ token?: string; accessToken?: string; refreshToken?: string }>>(
-          `${import.meta.env.VITE_API_BASE_URL}${API_PATHS.auth.refresh}`,
+        const refreshResponse = await refreshClient.post<ApiEnvelope<{ token?: string; accessToken?: string; refreshToken?: string }>>(
+          API_PATHS.auth.refresh,
           { refreshToken },
         )
 

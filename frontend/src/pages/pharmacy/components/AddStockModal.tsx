@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -48,6 +49,7 @@ type AddStockModalProps = {
  * Modal form for creating stock batches.
  */
 const AddStockModal = ({ isOpen, onClose, medicines, minExpiryDate, isSubmitting, onSubmitStock }: AddStockModalProps) => {
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const {
     register,
     handleSubmit,
@@ -67,9 +69,11 @@ const AddStockModal = ({ isOpen, onClose, medicines, minExpiryDate, isSubmitting
 
   const onSubmit = async (values: BatchFormValues) => {
     if (values.expiryDate < minExpiryDate) {
+      setSubmitError('Expiry date cannot be in the past.')
       return
     }
 
+    setSubmitError(null)
     await onSubmitStock({
       medicineId: Number(values.medicineId),
       vendorId: Number(values.vendorId),
@@ -138,6 +142,7 @@ const AddStockModal = ({ isOpen, onClose, medicines, minExpiryDate, isSubmitting
           >
             {isSubmitting ? 'Saving...' : 'Save Stock Batch'}
           </button>
+          {submitError ? <p className="mt-2 text-xs text-red-600">{submitError}</p> : null}
         </div>
       </form>
     </Modal>
