@@ -2,6 +2,7 @@ package com.apanaswastha.erp.security;
 
 import com.apanaswastha.erp.entity.Permission;
 import com.apanaswastha.erp.entity.User;
+import com.apanaswastha.erp.enums.UserStatus;
 import com.apanaswastha.erp.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,7 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsernameAndIsDeletedFalse(username)
+        User user = userRepository.findByUsernameAndIsDeletedFalseAndStatus(username, UserStatus.ACTIVE)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         Set<GrantedAuthority> authorities = new HashSet<>();

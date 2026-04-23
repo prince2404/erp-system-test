@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -56,6 +57,12 @@ class AuthServiceTest {
     private AuthenticationManager authenticationManager;
     @Mock
     private JwtTokenProvider jwtService;
+    @Mock
+    private UserToggleService userToggleService;
+    @Mock
+    private UserProfileService userProfileService;
+    @Mock
+    private AuthSessionService authSessionService;
 
     @InjectMocks
     private AuthServiceImpl authService;
@@ -75,7 +82,8 @@ class AuthServiceTest {
         when(roleRepository.findByName(RoleName.FAMILY)).thenReturn(Optional.of(familyRole));
         when(passwordEncoder.encode("plain-pass")).thenReturn("encoded-pass");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(jwtService.generateToken(any(UserDetails.class))).thenReturn("jwt-token");
+        when(jwtService.generateToken(any(UserDetails.class), anyString())).thenReturn("jwt-token");
+        when(jwtService.extractExpiration("jwt-token")).thenReturn(new java.util.Date(System.currentTimeMillis() + 10000));
 
         AuthResponse response = authService.register(request);
 
@@ -103,7 +111,11 @@ class AuthServiceTest {
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(principal);
-        when(jwtService.generateToken(eq(principal))).thenReturn("jwt-login");
+        when(jwtService.generateToken(eq(principal), anyString())).thenReturn("jwt-login");
+        when(jwtService.extractExpiration("jwt-login")).thenReturn(new java.util.Date(System.currentTimeMillis() + 10000));
+        User foundUser = new User();
+        foundUser.setUsername("test-user");
+        when(userRepository.findByUsernameAndIsDeletedFalse("test-user")).thenReturn(Optional.of(foundUser));
 
         AuthResponse response = authService.login(request);
 

@@ -39,6 +39,9 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtService;
+    private final UserToggleService userToggleService;
+    private final UserProfileService userProfileService;
+    private final AuthSessionService authSessionService;
 
     public AuthServiceImpl(
             UserRepository userRepository,
@@ -49,7 +52,10 @@ public class AuthServiceImpl implements AuthService {
             CenterRepository centerRepository,
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
-            JwtTokenProvider jwtService
+            JwtTokenProvider jwtService,
+            UserToggleService userToggleService,
+            UserProfileService userProfileService,
+            AuthSessionService authSessionService
     ) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
@@ -60,6 +66,9 @@ public class AuthServiceImpl implements AuthService {
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.userToggleService = userToggleService;
+        this.userProfileService = userProfileService;
+        this.authSessionService = authSessionService;
     }
 
     public AuthResponse register(RegisterRequest request) {
@@ -80,6 +89,8 @@ public class AuthServiceImpl implements AuthService {
         user.setAssignedBlock(resolveBlock(request.getAssignedBlockId()));
         user.setAssignedCenter(resolveCenter(request.getAssignedCenterId()));
         User savedUser = userRepository.save(user);
+        userToggleService.initializeDefaultToggles(savedUser);
+        userProfileService.initializeProfileTables(savedUser);
 
         UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
                 .username(savedUser.getUsername())
@@ -87,7 +98,11 @@ public class AuthServiceImpl implements AuthService {
                 .authorities("ROLE_" + savedUser.getRole().getName().name())
                 .build();
 
-        return new AuthResponse(jwtService.generateToken(userDetails));
+        String jti = java.util.UUID.randomUUID().toString();
+        String token = jwtService.generateToken(userDetails, jti);
+        authSessionService.createSession(savedUser, jti, token, jwtService.extractExpiration(token).toInstant(), "unknown", "unknown");
+        authSessionService.recordLogin(savedUser, true, "unknown", "unknown");
+        return new AuthResponse(token);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -95,7 +110,13 @@ public class AuthServiceImpl implements AuthService {
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
         UserDetails principal = (UserDetails) authentication.getPrincipal();
-        return new AuthResponse(jwtService.generateToken(principal));
+        User currentUser = userRepository.findByUsernameAndIsDeletedFalse(principal.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        String jti = java.util.UUID.randomUUID().toString();
+        String token = jwtService.generateToken(principal, jti);
+        authSessionService.createSession(currentUser, jti, token, jwtService.extractExpiration(token).toInstant(), "unknown", "unknown");
+        authSessionService.recordLogin(currentUser, true, "unknown", "unknown");
+        return new AuthResponse(token);
     }
 
     private Role resolveRole(Long roleId) {
