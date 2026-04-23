@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import api from '../lib/api'
-import type { ApiEnvelope } from './useAdminData'
+import { pharmacyApi } from '../api/pharmacyApi'
 
 export type Medicine = {
   id: number
@@ -26,46 +25,65 @@ export type InventoryBatch = {
   createdAt: string
 }
 
-const getMedicines = async () => {
-  const response = await api.get<ApiEnvelope<Medicine[]>>('/api/inventory/medicines')
-  return response.data.data
+/**
+ * Unwraps normalized API results and raises errors for react-query.
+ */
+const unwrapApiResult = <T>(result: { data: T | null; error: string | null }): T => {
+  if (result.error || result.data === null) {
+    throw new Error(result.error ?? 'Unexpected API error')
+  }
+
+  return result.data
 }
 
-const getInventory = async (centerId: number) => {
-  const response = await api.get<ApiEnvelope<InventoryBatch[]>>(`/api/inventory/centers/${centerId}/batches`)
-  return response.data.data
-}
-
+/**
+ * Medicines query.
+ */
 export const useMedicines = () =>
   useQuery({
     queryKey: ['pharmacy', 'medicines'],
-    queryFn: getMedicines,
+    queryFn: async () =>
+      unwrapApiResult<Medicine[]>(
+        (await pharmacyApi.getMedicines()) as { data: Medicine[] | null; error: string | null },
+      ),
   })
 
+/**
+ * Inventory query by center id.
+ */
 export const useInventory = (centerId?: number | null) =>
   useQuery({
     queryKey: ['pharmacy', 'inventory', centerId],
-    queryFn: () => getInventory(centerId ?? 0),
+    queryFn: async () =>
+      unwrapApiResult<InventoryBatch[]>(
+        (await pharmacyApi.getInventory(centerId ?? 0)) as { data: InventoryBatch[] | null; error: string | null },
+      ),
     enabled: typeof centerId === 'number' && Number.isFinite(centerId),
   })
 
+/**
+ * Medicine creation mutation.
+ */
 export const useCreateMedicine = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (payload: { name: string; genericName: string; manufacturer: string }) =>
-      api.post('/api/inventory/medicines', payload),
+    mutationFn: async (payload: { name: string; genericName: string; manufacturer: string }) =>
+      unwrapApiResult(await pharmacyApi.createMedicine(payload)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pharmacy', 'medicines'] })
     },
   })
 }
 
+/**
+ * Stock batch creation mutation.
+ */
 export const useAddStock = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (payload: {
+    mutationFn: async (payload: {
       medicineId: number
       vendorId: number
       centerId: number
@@ -74,17 +92,7 @@ export const useAddStock = () => {
       quantityReceived: number
       unitPrice: number
       sellingPrice: number
-    }) =>
-      api.post('/api/inventory/batches', {
-        medicineId: payload.medicineId,
-        vendorId: payload.vendorId,
-        centerId: payload.centerId,
-        batchNumber: payload.batchNumber,
-        expiryDate: payload.expiryDate,
-        quantityReceived: payload.quantityReceived,
-        unitPrice: payload.unitPrice,
-        sellingPrice: payload.sellingPrice,
-      }),
+    }) => unwrapApiResult(await pharmacyApi.addStock(payload)),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['pharmacy', 'inventory', variables.centerId] })
       queryClient.invalidateQueries({ queryKey: ['pharmacy', 'medicines'] })

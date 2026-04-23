@@ -1,12 +1,6 @@
 import { useMemo } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import api from '../lib/api'
-
-type ApiEnvelope<T> = {
-  success: boolean
-  message: string
-  data: T
-}
+import { clinicalApi } from '../api/clinicalApi'
 
 export type FamilyMember = {
   id: number
@@ -41,44 +35,43 @@ export type Appointment = {
   chiefComplaint: string | null
 }
 
-const getFamilies = async () => {
-  const response = await api.get<ApiEnvelope<Family[]>>('/api/v1/families')
-  return response.data.data
+/**
+ * Unwraps normalized API results and raises errors for react-query.
+ */
+const unwrapApiResult = <T>(result: { data: T | null; error: string | null }): T => {
+  if (result.error || result.data === null) {
+    throw new Error(result.error ?? 'Unexpected API error')
+  }
+
+  return result.data
 }
 
-const getFamily = async (healthCardNumber: string) => {
-  const response = await api.get<ApiEnvelope<Family>>(`/api/v1/families/${healthCardNumber}`)
-  return response.data.data
-}
-
-const getAppointments = async (doctorId?: number, status?: AppointmentStatus) => {
-  const response = await api.get<ApiEnvelope<Appointment[]>>('/api/opd/appointments', {
-    params: {
-      doctorId,
-      status,
-    },
-  })
-  return response.data.data
-}
-
-const getAppointment = async (appointmentId: number) => {
-  const response = await api.get<ApiEnvelope<Appointment>>(`/api/opd/appointments/${appointmentId}`)
-  return response.data.data
-}
-
+/**
+ * Families query.
+ */
 export const useFamilies = () =>
   useQuery({
     queryKey: ['families'],
-    queryFn: getFamilies,
+    queryFn: async () =>
+      unwrapApiResult<Family[]>((await clinicalApi.getFamilies()) as { data: Family[] | null; error: string | null }),
   })
 
+/**
+ * Family details query.
+ */
 export const useFamily = (healthCardNumber?: string) =>
   useQuery({
     queryKey: ['family', healthCardNumber],
-    queryFn: () => getFamily(healthCardNumber ?? ''),
+    queryFn: async () =>
+      unwrapApiResult<Family>(
+        (await clinicalApi.getFamily(healthCardNumber ?? '')) as { data: Family | null; error: string | null },
+      ),
     enabled: Boolean(healthCardNumber),
   })
 
+/**
+ * Derived patient list generated from family data.
+ */
 export const usePatients = () => {
   const familiesQuery = useFamilies()
 
@@ -101,95 +94,101 @@ export const usePatients = () => {
   }
 }
 
+/**
+ * Appointments query with optional doctor/status filters.
+ */
 export const useAppointments = (doctorId?: number, status?: AppointmentStatus) =>
   useQuery({
     queryKey: ['appointments', doctorId ?? null, status ?? null],
-    queryFn: () => getAppointments(doctorId, status),
+    queryFn: async () =>
+      unwrapApiResult<Appointment[]>(
+        (await clinicalApi.getAppointments(doctorId, status)) as { data: Appointment[] | null; error: string | null },
+      ),
   })
 
+/**
+ * Appointment details query.
+ */
 export const useAppointment = (appointmentId?: number) =>
   useQuery({
     queryKey: ['appointment', appointmentId],
-    queryFn: () => getAppointment(appointmentId ?? 0),
+    queryFn: async () =>
+      unwrapApiResult<Appointment>(
+        (await clinicalApi.getAppointment(appointmentId ?? 0)) as { data: Appointment | null; error: string | null },
+      ),
     enabled: typeof appointmentId === 'number' && Number.isFinite(appointmentId),
   })
 
+/**
+ * Family creation mutation.
+ */
 export const useCreateFamily = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (payload: { familyHeadName: string; centerId: number }) => api.post('/api/v1/families', payload),
+    mutationFn: async (payload: { familyHeadName: string; centerId: number }) => unwrapApiResult(await clinicalApi.createFamily(payload)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['families'] })
     },
   })
 }
 
+/**
+ * Patient/member creation mutation.
+ */
 export const useCreatePatient = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (payload: {
+    mutationFn: async (payload: {
       healthCardNumber: string
       firstName: string
       lastName: string
       dob: string
       gender: string
       bloodGroup: string
-    }) =>
-      api.post(`/api/v1/families/${payload.healthCardNumber}/members`, {
-        firstName: payload.firstName,
-        lastName: payload.lastName,
-        dob: payload.dob,
-        gender: payload.gender,
-        bloodGroup: payload.bloodGroup,
-      }),
+    }) => unwrapApiResult(await clinicalApi.createPatient(payload)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['families'] })
     },
   })
 }
 
+/**
+ * Appointment creation mutation.
+ */
 export const useCreateAppointment = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (payload: {
+    mutationFn: async (payload: {
       patientId: number
       centerId: number
       doctorId: number
       appointmentDate: string
       chiefComplaint: string
-    }) => api.post('/api/opd/appointments', payload),
+    }) => unwrapApiResult(await clinicalApi.createAppointment(payload)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments'] })
     },
   })
 }
 
+/**
+ * Diagnosis creation mutation.
+ */
 export const useCreateDiagnosis = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (payload: {
+    mutationFn: async (payload: {
       appointmentId: number
       symptoms: string
       medicalNotes: string
       medicineName: string
       dosage: string
       duration: string
-    }) =>
-      api.post(`/api/opd/appointments/${payload.appointmentId}/diagnosis`, {
-        symptoms: payload.symptoms,
-        medicalNotes: payload.medicalNotes,
-        prescriptions: [
-          {
-            medicineName: payload.medicineName,
-            dosage: payload.dosage,
-            duration: payload.duration,
-          },
-        ],
-      }),
+    }) => unwrapApiResult(await clinicalApi.createDiagnosis(payload)),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['appointment', variables.appointmentId] })
       queryClient.invalidateQueries({ queryKey: ['appointments'] })
@@ -197,14 +196,15 @@ export const useCreateDiagnosis = () => {
   })
 }
 
+/**
+ * Appointment status update mutation.
+ */
 export const useUpdateAppointmentStatus = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (payload: { appointmentId: number; status: AppointmentStatus }) =>
-      api.put(`/api/opd/appointments/${payload.appointmentId}/status`, {
-        status: payload.status,
-      }),
+    mutationFn: async (payload: { appointmentId: number; status: AppointmentStatus }) =>
+      unwrapApiResult(await clinicalApi.updateAppointmentStatus(payload)),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['appointment', variables.appointmentId] })
       queryClient.invalidateQueries({ queryKey: ['appointments'] })

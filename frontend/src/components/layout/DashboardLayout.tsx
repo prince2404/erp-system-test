@@ -1,186 +1,25 @@
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { TOKEN_STORAGE_KEY } from '../../lib/api'
-import { useCurrentUser } from '../../hooks/useAdminData'
-import { canAccessUsers } from '../../lib/rbac'
+import { Outlet } from 'react-router-dom'
+import Footer from './Footer'
+import Navbar from './Navbar'
+import PageWrapper from './PageWrapper'
+import Sidebar from './Sidebar'
 
+/**
+ * Dashboard shell layout for authenticated users.
+ * Access is enforced upstream by ProtectedRoute.
+ */
 const DashboardLayout = () => {
-  const navigate = useNavigate()
-  const { data: currentUser } = useCurrentUser()
-
-  const handleLogout = () => {
-    localStorage.removeItem(TOKEN_STORAGE_KEY)
-    navigate('/login', { replace: true })
-  }
-
-  const role = currentUser?.role
-  const isSuperAdmin = role === 'SUPER_ADMIN'
-  const canSeeReceptionNav = role === 'RECEPTIONIST' || isSuperAdmin
-  const canSeeBillingNav = role === 'RECEPTIONIST' || role === 'CASHIER' || isSuperAdmin
-  const canSeeDoctorNav = role === 'DOCTOR' || isSuperAdmin
-  const canSeePharmacyNav = role === 'PHARMACIST' || isSuperAdmin
-
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900">
       <div className="flex min-h-screen">
-        <aside className="w-64 border-r border-slate-200 bg-white p-4">
-          <Link to="/dashboard" className="mb-8 block text-xl font-bold text-indigo-600">
-            ERP System
-          </Link>
-          <nav className="space-y-2">
-            <NavLink
-              to="/dashboard"
-              end
-              className={({ isActive }) =>
-                `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
-              }
-            >
-              Dashboard Home
-            </NavLink>
-            <NavLink
-              to="/admin/states"
-              className={({ isActive }) =>
-                `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
-              }
-            >
-              States
-            </NavLink>
-            <NavLink
-              to="/admin/districts"
-              className={({ isActive }) =>
-                `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
-              }
-            >
-              Districts
-            </NavLink>
-            <NavLink
-              to="/admin/blocks"
-              className={({ isActive }) =>
-                `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
-              }
-            >
-              Blocks
-            </NavLink>
-            <NavLink
-              to="/admin/centers"
-              className={({ isActive }) =>
-                `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
-              }
-            >
-              Centers
-            </NavLink>
-            {canSeeReceptionNav ? (
-              <>
-                <NavLink
-                  to="/reception/families"
-                  className={({ isActive }) =>
-                    `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
-                  }
-                >
-                  Families
-                </NavLink>
-                <NavLink
-                  to="/reception/patients"
-                  className={({ isActive }) =>
-                    `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
-                  }
-                >
-                  Patients
-                </NavLink>
-                <NavLink
-                  to="/reception/appointments"
-                  className={({ isActive }) =>
-                    `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
-                  }
-                >
-                  Appointments
-                </NavLink>
-              </>
-            ) : null}
-            {canSeeDoctorNav ? (
-              <NavLink
-                to="/doctor/queue"
-                className={({ isActive }) =>
-                  `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
-                }
-              >
-                OPD Queue
-              </NavLink>
-            ) : null}
-            {canSeeBillingNav ? (
-              <>
-                <NavLink
-                  to="/billing/invoices"
-                  className={({ isActive }) =>
-                    `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
-                  }
-                >
-                  Billing Invoices
-                </NavLink>
-                <NavLink
-                  to="/billing/wallet-topup"
-                  className={({ isActive }) =>
-                    `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
-                  }
-                >
-                  Wallet Top-Up
-                </NavLink>
-              </>
-            ) : null}
-            {canSeePharmacyNav ? (
-              <>
-                <NavLink
-                  to="/pharmacy/medicines"
-                  className={({ isActive }) =>
-                    `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
-                  }
-                >
-                  Medicine Catalog
-                </NavLink>
-                <NavLink
-                  to="/pharmacy/inventory"
-                  className={({ isActive }) =>
-                    `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
-                  }
-                >
-                  Inventory
-                </NavLink>
-              </>
-            ) : null}
-            <NavLink
-              to="/commissions/ledger"
-              className={({ isActive }) =>
-                `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
-              }
-            >
-              Commission Ledger
-            </NavLink>
-            {canAccessUsers(currentUser?.role) ? (
-              <NavLink
-                to="/admin/users"
-                className={({ isActive }) =>
-                  `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
-                }
-              >
-                Users
-              </NavLink>
-            ) : null}
-          </nav>
-        </aside>
+        <Sidebar />
 
-        <main className="flex-1">
-          <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
-            <h1 className="text-lg font-semibold">Dashboard</h1>
-            <button
-              onClick={handleLogout}
-              className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
-            >
-              Logout
-            </button>
-          </header>
-
-          <section className="p-6">
+        <main className="flex flex-1 flex-col">
+          <Navbar title="Dashboard" />
+          <PageWrapper>
             <Outlet />
-          </section>
+          </PageWrapper>
+          <Footer />
         </main>
       </div>
     </div>

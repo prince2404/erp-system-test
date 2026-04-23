@@ -1,22 +1,17 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import api, { TOKEN_STORAGE_KEY } from '../lib/api'
+import { authApi } from '../../api/authApi'
+import { ROUTE_PATHS } from '../../constants/routePaths'
+import { useAuth } from '../../hooks/useAuth'
 
-type LoginApiResponse = {
-  data: {
-    token: string
-  }
-}
-
-type ApiEnvelope = {
-  success: boolean
-  message: string
-  data: LoginApiResponse['data']
-}
-
+/**
+ * Login page for unauthenticated users.
+ * Access: public route only.
+ */
 const LoginPage = () => {
   const navigate = useNavigate()
+  const { login } = useAuth()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -27,15 +22,16 @@ const LoginPage = () => {
     setError(null)
     setIsLoading(true)
 
-    try {
-      const response = await api.post<ApiEnvelope>('/api/auth/login', { username, password })
-      localStorage.setItem(TOKEN_STORAGE_KEY, response.data.data.token)
-      navigate('/dashboard', { replace: true })
-    } catch {
+    const response = await authApi.login({ username, password })
+    if (response.error || !response.data) {
       setError('Invalid username or password. Please try again.')
-    } finally {
       setIsLoading(false)
+      return
     }
+
+    login(response.data.token, response.data.refreshToken ?? null)
+    navigate(ROUTE_PATHS.dashboard, { replace: true })
+    setIsLoading(false)
   }
 
   return (

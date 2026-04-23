@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import DataTable, { type Column } from '../../components/common/DataTable'
 import { useCreateMedicine, useMedicines, type Medicine } from '../../hooks/usePharmacyData'
-import { useCurrentUser } from '../../hooks/useAdminData'
+import { usePermission } from '../../hooks/usePermission'
 
 const schema = z.object({
   name: z.string().trim().min(2, 'Medicine name is required'),
@@ -21,10 +21,10 @@ const columns: Column<Medicine>[] = [
 ]
 
 const MedicinesPage = () => {
-  const { data: currentUser } = useCurrentUser()
+  const { hasPermission } = usePermission()
   const { data: medicines = [], isLoading } = useMedicines()
   const createMedicine = useCreateMedicine()
-  const canAccessPharmacy = currentUser?.role === 'PHARMACIST' || currentUser?.role === 'SUPER_ADMIN'
+  const canAccessPharmacy = hasPermission('pharmacy:view')
 
   const {
     register,

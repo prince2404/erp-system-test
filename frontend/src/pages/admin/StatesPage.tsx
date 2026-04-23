@@ -4,8 +4,8 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import DataTable, { type Column } from '../../components/common/DataTable'
 import Modal from '../../components/common/Modal'
-import { useCreateState, useCurrentUser, useStates, type StateItem } from '../../hooks/useAdminData'
-import { canCreateState } from '../../lib/rbac'
+import { useCreateState, useStates, type StateItem } from '../../hooks/useAdminData'
+import { usePermission } from '../../hooks/usePermission'
 
 const schema = z.object({
   name: z.string().trim().min(2, 'State name is required'),
@@ -22,7 +22,7 @@ const columns: Column<StateItem>[] = [
 const StatesPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const { data: states = [], isLoading } = useStates()
-  const { data: currentUser } = useCurrentUser()
+  const { hasPermission } = usePermission()
   const createState = useCreateState()
 
   const {
@@ -38,7 +38,7 @@ const StatesPage = () => {
     setIsModalOpen(false)
   }
 
-  const canCreate = canCreateState(currentUser?.role)
+  const canCreate = hasPermission('user:create')
 
   return (
     <div className="space-y-4">
