@@ -13,7 +13,6 @@ type PasswordForm = { currentPassword: string; newPassword: string; confirmPassw
  * Change password, active sessions, 2FA, login history.
  */
 const SecuritySection = () => {
-  const [show2fa, setShow2fa] = useState(false)
   const [twoFaMethod, setTwoFaMethod] = useState('sms')
 
   const changePassword = useChangePassword()

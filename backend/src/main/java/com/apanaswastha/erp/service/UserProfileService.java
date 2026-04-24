@@ -537,8 +537,9 @@ public class UserProfileService {
 
     private UserProfile ensureProfile(User user) {
         return userProfileRepository.findById(user.getId()).orElseGet(() -> {
+            User managedUser = userRepository.getReferenceById(user.getId());
             UserProfile profile = new UserProfile();
-            profile.setUser(user);
+            profile.setUser(managedUser);
             profile.setFullName(user.getUsername());
             profile.setPhone(user.getPhone() == null ? "" : user.getPhone());
             profile.setEmail(user.getEmail());
@@ -548,24 +549,27 @@ public class UserProfileService {
 
     private UserVerification ensureVerification(User user) {
         return userVerificationRepository.findById(user.getId()).orElseGet(() -> {
+            User managedUser = userRepository.getReferenceById(user.getId());
             UserVerification verification = new UserVerification();
-            verification.setUser(user);
+            verification.setUser(managedUser);
             return userVerificationRepository.save(verification);
         });
     }
 
     private User2FaSetting ensure2Fa(User user) {
         return user2FaSettingRepository.findById(user.getId()).orElseGet(() -> {
+            User managedUser = userRepository.getReferenceById(user.getId());
             User2FaSetting setting = new User2FaSetting();
-            setting.setUser(user);
+            setting.setUser(managedUser);
             return user2FaSettingRepository.save(setting);
         });
     }
 
     private UserPreference ensurePreferences(User user) {
         return userPreferenceRepository.findById(user.getId()).orElseGet(() -> {
+            User managedUser = userRepository.getReferenceById(user.getId());
             UserPreference preference = new UserPreference();
-            preference.setUser(user);
+            preference.setUser(managedUser);
             return userPreferenceRepository.save(preference);
         });
     }
