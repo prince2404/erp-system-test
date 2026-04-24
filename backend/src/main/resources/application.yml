@@ -21,6 +21,10 @@ spring:
         format_sql: true
   jackson:
     default-property-inclusion: non_null
+  sql:
+    init:
+      mode: always
+      separator: "@@"
   data:
     web:
       pageable:
