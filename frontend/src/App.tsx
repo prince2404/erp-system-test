@@ -13,6 +13,7 @@ import CentersPage from './pages/admin/CentersPage'
 import DistrictsPage from './pages/admin/DistrictsPage'
 import StatesPage from './pages/admin/StatesPage'
 import UsersPage from './pages/users/UsersPage'
+import ProfilePage from './pages/profile/ProfilePage'
 import BillingInvoicesPage from './pages/billing/BillingInvoicesPage'
 import WalletTopUpPage from './pages/billing/WalletTopUpPage'
 import CommissionLedgerPage from './pages/commissions/CommissionLedgerPage'
@@ -42,6 +43,7 @@ const App = () => {
                 <Route element={<ProtectedRoute />}>
                   <Route element={<DashboardLayout />}>
                     <Route path={ROUTE_PATHS.dashboard} element={<DashboardHomePage />} />
+                    <Route path={ROUTE_PATHS.profile} element={<ProfilePage />} />
                     <Route path={ROUTE_PATHS.admin.states} element={<StatesPage />} />
                     <Route path={ROUTE_PATHS.admin.districts} element={<DistrictsPage />} />
                     <Route path={ROUTE_PATHS.admin.blocks} element={<BlocksPage />} />

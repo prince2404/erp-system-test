@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { adminApi } from '../api/adminApi'
-import { authApi } from '../api/authApi'
 import { userApi } from '../api/userApi'
 
 /**
@@ -53,18 +52,19 @@ export type UserSummary = {
   email: string
   phone: string
   role: string
+  status: string
 }
 
 type UserPage = {
   content: UserSummary[]
 }
 
-type RegisterPayload = {
+type ManagedUserPayload = {
   username: string
   password: string
   email: string
   phone?: string
-  roleId: number
+  role: string
   assignedStateId?: number
   assignedDistrictId?: number
   assignedBlockId?: number
@@ -74,7 +74,7 @@ type RegisterPayload = {
 /**
  * Unwraps normalized API results and throws for react-query error handling.
  */
-const unwrapApiResult = <T>(result: { data: T | null; error: string | null }): T => {
+const unwrapApiResult = <T,>(result: { data: T | null; error: string | null }): T => {
   if (result.error || result.data === null) {
     throw new Error(result.error ?? 'Unexpected API error')
   }
@@ -204,13 +204,13 @@ export const useCreateCenter = () => {
 }
 
 /**
- * Mutation hook for user registration.
+ * Mutation hook for user creation using managed-user endpoint.
  */
 export const useCreateUser = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (payload: RegisterPayload) => unwrapApiResult(await authApi.register(payload)),
+    mutationFn: async (payload: ManagedUserPayload) => unwrapApiResult(await userApi.createManagedUser(payload)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
     },

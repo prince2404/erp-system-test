@@ -1,106 +1,77 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
 import Modal from '../../../components/common/Modal'
-import { ROLE_ID_BY_NAME, ROLE_NAMES, type RoleName } from '../../../constants/roles'
+import { useAssignableRoles } from '../../../hooks/useProfileData'
+import { useCreateUser } from '../../../hooks/useAdminData'
 import type { BlockItem, CenterItem, DistrictItem, StateItem } from '../../../hooks/useAdminData'
 
-const centerLevelRoles: RoleName[] = ['HR_MANAGER', 'DOCTOR', 'PHARMACIST', 'RECEPTIONIST', 'STAFF']
+const centerLevelRoles = ['hr_manager', 'doctor', 'pharmacist', 'receptionist', 'staff', 'center_staff']
 
-/**
- * Calculates assignment scope based on selected role.
- */
-const getAssignmentScope = (role: RoleName | '') => {
-  if (role === 'STATE_MANAGER') return 'state'
-  if (role === 'DISTRICT_MANAGER') return 'district'
-  if (role === 'BLOCK_MANAGER') return 'block'
-  if (centerLevelRoles.includes(role as RoleName)) return 'center'
+const getAssignmentScope = (role: string) => {
+  const r = role.toLowerCase()
+  if (r === 'state_manager') return 'state'
+  if (r === 'district_manager') return 'district'
+  if (r === 'block_manager') return 'block'
+  if (centerLevelRoles.includes(r)) return 'center'
   return null
 }
 
-const schema = z
-  .object({
-    username: z.string().trim().min(3, 'Username is required'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-    email: z.string().email('Valid email is required'),
-    phone: z.string().trim().optional(),
-    role: z.enum(ROLE_NAMES),
-    assignedEntityId: z.string().optional(),
-  })
-  .superRefine((values, context) => {
-    const scope = getAssignmentScope(values.role)
-    if (scope && !values.assignedEntityId) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['assignedEntityId'],
-        message: `Please select ${scope} assignment`,
-      })
-    }
-  })
-
-type FormValues = z.infer<typeof schema>
+type FormValues = {
+  username: string
+  password: string
+  email: string
+  phone: string
+  role: string
+  assignedEntityId: string
+}
 
 type UserCreateModalProps = {
   isOpen: boolean
   onClose: () => void
-  onCreate: (payload: {
-    username: string
-    password: string
-    email: string
-    phone?: string
-    roleId: number
-    assignedStateId?: number
-    assignedDistrictId?: number
-    assignedBlockId?: number
-    assignedCenterId?: number
-  }) => Promise<void>
   states: StateItem[]
   districts: DistrictItem[]
   blocks: BlockItem[]
   centers: CenterItem[]
-  isSubmitting: boolean
-  hasError: boolean
 }
 
 /**
- * Modal form for creating a new user with scope-based assignment.
+ * Modal form for creating a new user with backend-driven role dropdown.
  */
-const UserCreateModal = ({
-  isOpen,
-  onClose,
-  onCreate,
-  states,
-  districts,
-  blocks,
-  centers,
-  isSubmitting,
-  hasError,
-}: UserCreateModalProps) => {
+const UserCreateModal = ({ isOpen, onClose, states, districts, blocks, centers }: UserCreateModalProps) => {
+  const { data: assignableRolesData } = useAssignableRoles()
+  const createUser = useCreateUser()
+  const assignableRoles = assignableRolesData?.roles ?? []
+
   const {
     register,
     handleSubmit,
     watch,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: { role: 'STATE_MANAGER' },
+    defaultValues: { username: '', password: '', email: '', phone: '', role: '', assignedEntityId: '' },
   })
 
   const watchedRole = watch('role')
   const assignmentScope = getAssignmentScope(watchedRole)
 
+  // Reset role to first assignable when list loads
+  useEffect(() => {
+    if (assignableRoles.length > 0 && !watchedRole) {
+      setValue('role', assignableRoles[0])
+    }
+  }, [assignableRoles, watchedRole, setValue])
+
   const assignmentOptions = useMemo(() => {
-    if (assignmentScope === 'state') return states.map((state) => ({ id: state.id, label: state.name }))
-    if (assignmentScope === 'district') return districts.map((district) => ({ id: district.id, label: district.name }))
-    if (assignmentScope === 'block') return blocks.map((block) => ({ id: block.id, label: block.name }))
-    if (assignmentScope === 'center') return centers.map((center) => ({ id: center.id, label: center.name }))
+    if (assignmentScope === 'state') return states.map((s) => ({ id: s.id, label: s.name }))
+    if (assignmentScope === 'district') return districts.map((d) => ({ id: d.id, label: d.name }))
+    if (assignmentScope === 'block') return blocks.map((b) => ({ id: b.id, label: b.name }))
+    if (assignmentScope === 'center') return centers.map((c) => ({ id: c.id, label: c.name }))
     return []
   }, [assignmentScope, blocks, centers, districts, states])
 
   const onSubmit = async (values: FormValues) => {
-    const roleId = ROLE_ID_BY_NAME[values.role]
     const assignedEntityId = values.assignedEntityId ? Number(values.assignedEntityId) : undefined
     const assignedPayload =
       assignmentScope === 'state'
@@ -113,60 +84,84 @@ const UserCreateModal = ({
               ? { assignedCenterId: assignedEntityId }
               : {}
 
-    await onCreate({
+    await createUser.mutateAsync({
       username: values.username,
       password: values.password,
       email: values.email,
-      phone: values.phone,
-      roleId,
+      phone: values.phone || undefined,
+      role: values.role.toUpperCase(),
       ...assignedPayload,
     })
 
-    reset({ role: 'STATE_MANAGER' })
+    reset()
     onClose()
   }
 
   return (
-    <Modal title="Create User" isOpen={isOpen} onClose={onClose}>
+    <Modal title="Create New User" isOpen={isOpen} onClose={onClose}>
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">Username</label>
-          <input {...register('username')} className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          <label className="mb-1 block text-sm font-medium text-slate-700">Username *</label>
+          <input
+            {...register('username', { required: 'Username is required', minLength: { value: 3, message: 'Min 3 chars' } })}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+          />
           {errors.username ? <p className="mt-1 text-xs text-red-600">{errors.username.message}</p> : null}
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">Password</label>
-          <input type="password" {...register('password')} className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          <label className="mb-1 block text-sm font-medium text-slate-700">Password *</label>
+          <input
+            type="password"
+            {...register('password', { required: 'Password is required', minLength: { value: 6, message: 'Min 6 chars' } })}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+          />
           {errors.password ? <p className="mt-1 text-xs text-red-600">{errors.password.message}</p> : null}
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">Email</label>
-          <input type="email" {...register('email')} className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          <label className="mb-1 block text-sm font-medium text-slate-700">Email *</label>
+          <input
+            type="email"
+            {...register('email', { required: 'Email is required' })}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+          />
           {errors.email ? <p className="mt-1 text-xs text-red-600">{errors.email.message}</p> : null}
         </div>
 
         <div>
           <label className="mb-1 block text-sm font-medium text-slate-700">Phone</label>
-          <input {...register('phone')} className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          <input
+            {...register('phone')}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+          />
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">Role</label>
-          <select {...register('role')} className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
-            {ROLE_NAMES.map((role) => (
+          <label className="mb-1 block text-sm font-medium text-slate-700">Role *</label>
+          <select
+            {...register('role', { required: 'Role is required' })}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+          >
+            <option value="">Select role</option>
+            {assignableRoles.map((role) => (
               <option key={role} value={role}>
-                {role}
+                {role.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
               </option>
             ))}
           </select>
+          {errors.role ? <p className="mt-1 text-xs text-red-600">{errors.role.message}</p> : null}
         </div>
 
         {assignmentScope ? (
           <div>
-            <label className="mb-1 block text-sm font-medium capitalize text-slate-700">Assigned {assignmentScope}</label>
-            <select {...register('assignedEntityId')} className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
+            <label className="mb-1 block text-sm font-medium capitalize text-slate-700">
+              Assigned {assignmentScope} *
+            </label>
+            <select
+              {...register('assignedEntityId', { required: `Please select a ${assignmentScope}` })}
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            >
               <option value="">Select {assignmentScope}</option>
               {assignmentOptions.map((option) => (
                 <option key={option.id} value={option.id}>
@@ -178,15 +173,24 @@ const UserCreateModal = ({
           </div>
         ) : null}
 
-        {hasError ? <p className="text-xs text-red-600">Unable to create user. Please verify input and role permissions.</p> : null}
+        {createUser.isError ? (
+          <div className="rounded-lg bg-red-50 p-3 text-xs text-red-700">
+            Unable to create user. Please verify input and role permissions.
+          </div>
+        ) : null}
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-        >
-          {isSubmitting ? 'Saving...' : 'Save User'}
-        </button>
+        <div className="flex justify-end gap-3 pt-2">
+          <button type="button" onClick={onClose} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={createUser.isPending}
+            className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 disabled:opacity-60"
+          >
+            {createUser.isPending ? 'Creating...' : 'Create User'}
+          </button>
+        </div>
       </form>
     </Modal>
   )

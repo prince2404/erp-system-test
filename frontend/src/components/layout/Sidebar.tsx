@@ -56,7 +56,7 @@ const Sidebar = () => {
       <Link to={ROUTE_PATHS.dashboard} className="mb-8 block text-xl font-bold text-indigo-600">
         {APP_NAME}
       </Link>
-      <nav className="space-y-2">
+      <nav className="space-y-1">
         {navItems.map((item) => (
           <NavLink
             key={item.path}
@@ -69,6 +69,17 @@ const Sidebar = () => {
             {item.label}
           </NavLink>
         ))}
+
+        {/* Profile link — always visible */}
+        <hr className="my-3 border-slate-200" />
+        <NavLink
+          to={ROUTE_PATHS.profile}
+          className={({ isActive }) =>
+            `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-indigo-100 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
+          }
+        >
+          👤 My Profile
+        </NavLink>
       </nav>
     </aside>
   )

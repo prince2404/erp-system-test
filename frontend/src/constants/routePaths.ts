@@ -4,6 +4,7 @@
 export const ROUTE_PATHS = {
   login: '/login',
   dashboard: '/dashboard',
+  profile: '/profile',
   admin: {
     states: '/admin/states',
     districts: '/admin/districts',

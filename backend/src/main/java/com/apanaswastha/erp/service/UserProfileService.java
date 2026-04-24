@@ -68,7 +68,7 @@ public class UserProfileService {
         ensurePreferences(user);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Map<String, Object> getOwnProfile(User user) {
         UserProfile profile = ensureProfile(user);
         UserVerification verification = ensureVerification(user);
